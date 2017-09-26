@@ -27,7 +27,8 @@ Application.ScreenUpdating = False
 
 file = Dir(folder & "*.xls")
 
-Set wbMerge = Application.Workbooks("Merge PreBills.xlsb")
+'Set wbMerge = Application.Workbooks("Merge PreBills.xlsb")
+Set wbMerge = Application.ThisWorkbook
 Set wsRoad = wbMerge.Sheets("Road")
 Set wsFCL = wbMerge.Sheets("FCL")
 Set wsLCL = wbMerge.Sheets("LCL")
@@ -143,7 +144,7 @@ Dim sht As Variant
 mb = MsgBox("You are about to clear all data from pre bill sheets." & Chr(13) & "Are you sure?", vbOKCancel + vbQuestion)
 
 If mb = 1 Then
-    arrSheets = Array(Road, FCL, LCL, Air)
+    arrSheets = Array(Road, FCL, LCL, Air, ALL)
     
     For Each sht In arrSheets
         sht.UsedRange.Offset(1).ClearContents
