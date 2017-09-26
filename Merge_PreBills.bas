@@ -137,38 +137,18 @@ End Function
 
 Sub clear_all()
 Dim mb As Integer
+Dim arrSheets As Variant
+Dim sht As Variant
+
 mb = MsgBox("You are about to clear all data from pre bill sheets." & Chr(13) & "Are you sure?", vbOKCancel + vbQuestion)
+
 If mb = 1 Then
-    Road.Select
-    If ActiveSheet.UsedRange.Rows.Count > 1 Then
-        Rows("2:" & ActiveSheet.UsedRange.Rows.Count).Select
-        Selection.Delete Shift:=xlUp
-        Range("A2").Select
-    End If
+    arrSheets = Array(Road, FCL, LCL, Air)
     
-    FCL.Select
-    If ActiveSheet.UsedRange.Rows.Count > 1 Then
-        Rows("2:" & ActiveSheet.UsedRange.Rows.Count).Select
-        Selection.Delete Shift:=xlUp
-        Range("A2").Select
-    End If
-        
-    LCL.Select
-    If ActiveSheet.UsedRange.Rows.Count > 1 Then
-        Rows("2:" & ActiveSheet.UsedRange.Rows.Count).Select
-        Selection.Delete Shift:=xlUp
-        Range("A2").Select
-    End If
-        
-    Air.Select
-    If ActiveSheet.UsedRange.Rows.Count > 1 Then
-        Rows("2:" & ActiveSheet.UsedRange.Rows.Count).Select
-        Selection.Delete Shift:=xlUp
-        Range("A2").Select
-    End If
-        
-    Road.Select
-    Range("A2").Select
+    For Each sht In arrSheets
+        sht.UsedRange.Offset(1).ClearContents
+    Next sht
+    
     MsgBox "Pre bill sheets are now empty."
 Else
     MsgBox "Macro cancelled."
