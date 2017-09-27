@@ -11,7 +11,7 @@ shipments.Select
 
 For Each shipment In shipments
     srcShipment = shipment.Value
-    Cells.Find(What:="HKD018554", After:=ActiveCell, LookIn:=xlValues, _
+    Cells.Find(what:="HKD018554", After:=ActiveCell, LookIn:=xlValues, _
     LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
     MatchCase:=False, SearchFormat:=False).Activate
 Next shipment
