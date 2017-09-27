@@ -6,7 +6,7 @@ Dim shipment, shipments As Range
 Dim srcShipment As String
 
 AC.Activate
-Set shipments = Range(Cells(2, 7), Cells(AC.UsedRange.Rows.Count, 7))
+Set shipments = Range(Cells(2, 7), Cells(AC.UsedRange.Rows.count, 7))
 shipments.Select
 
 For Each shipment In shipments
