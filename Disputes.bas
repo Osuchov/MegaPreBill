@@ -9,10 +9,12 @@ Dim wsDisputes As Worksheet
 Dim disputeFile As String
 Dim disputeRng As Range
 Dim parkedDispute As Range
-Dim shipment As String
+Dim Shipment As String
 Dim arrSheets As Variant, sht As Variant
-Dim lookWhere As Range
-Dim foundWhere As Range
+Dim lookWhere As Range, foundWhere As Range
+Dim firstFoundAddress As String
+Dim preBills As String
+Dim missingShipmentRow As Long
 
 arrSheets = Array(Road, FCL, LCL, Air)
 
@@ -35,25 +37,53 @@ Application.DisplayAlerts = False
 Application.AskToUpdateLinks = False
 Application.ScreenUpdating = False
 
+On Error Resume Next   'turn off error reporting
+For Each sht In arrSheets       'filter out volatile pre bills
+    ActiveSheet.ShowAllData
+    sht.Rows("1:1").AutoFilter Field:=1, Criteria1:="<>0", _
+            VisibleDropDown:=False
+Next sht
+On Error GoTo ErrHandling       'turning off warnings
+
 Set wb = Workbooks.Open(disputeFile)
 Set wsDisputes = Sheets("Disputes")
 wsDisputes.Rows("1:1").AutoFilter Field:=25, Criteria1:="parked", _
     VisibleDropDown:=False
 
-Set disputeRng = wsDisputes.UsedRange
+Set disputeRng = wsDisputes.UsedRange.Columns(9)
 
+'loop on all disputes (shipment numbers)
 For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible).EntireRow
+    preBills = ""
+    Shipment = Cells(parkedDispute.Row, 9).Value
+    If Shipment = "" Then
+        missingShipmentRow = parkedDispute.Row
+        GoTo missingShipment
+    End If
     
-    shipment = Cells(parkedDispute.Row, 9)
-      
-    For Each sht In arrSheets
-        Set lookWhere = sht.UsedRange.Columns(9)
-        Set foundWhere = lookWhere.Find(what:=shipment, LookIn:=xlValues, LookAt:=xlPart, MatchCase:=False)
+    For Each sht In arrSheets   'loop through all transport modes
+        Set lookWhere = sht.UsedRange.Columns(8)
+        Set foundWhere = lookWhere.Find(what:=Shipment, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+                MatchCase:=False, SearchFormat:=False)
+        
         If Not foundWhere Is Nothing Then
-            Cells(parkedDispute.Row, 40) = "Found on pre bill: " & sht.Cells(foundWhere.Row, 1)
-            Exit For
+            firstFoundAddress = foundWhere.Address
+            preBills = preBills & sht.Cells(foundWhere.Row, 1).Value & " " 'lookWhere.Cells(foundWhere.Row, 1).Value & " "
+            Do
+                Set foundWhere = lookWhere.FindNext(foundWhere)
+                If Not foundWhere Is Nothing Then
+                    preBills = preBills & sht.Cells(foundWhere.Row, 1).Value & " "
+                Else
+                    Exit Do
+                End If
+            Loop While foundWhere.Address <> firstFoundAddress
         End If
     Next sht
+    
+    If Len(preBills) = 0 Then
+        preBills = "not found"
+    End If
+    Cells(parkedDispute.Row, 40).Value = preBills
 
 Next parkedDispute
 
@@ -68,5 +98,11 @@ CleaningUp:
 ErrHandling:
     MsgBox Err & ". " & Err.Description
     Resume CleaningUp
-    
+missingShipment:
+    On Error Resume Next
+    Application.DisplayAlerts = True 'turning on warnings
+    Application.AskToUpdateLinks = True
+    Application.ScreenUpdating = True
+    MsgBox "Shipment in " & missingShipmentRow & " is missing. Check if that is the end of the file."
+    Exit Sub
 End Sub

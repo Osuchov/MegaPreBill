@@ -1,6 +1,12 @@
 *.xlsm
+*.xlsb
+
 *.xlam
+
 *.accdb
+
 *.accde
+
 *.accdr
+
 *.laccdb
