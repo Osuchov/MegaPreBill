@@ -200,8 +200,11 @@ If mb = 1 Then
             sht.Activate
             sht.UsedRange.Select
         Else
+            On Error Resume Next   'turn off error reporting
+            ActiveSheet.ShowAllData
             sht.Activate
             sht.UsedRange.Offset(1).Select
+            On Error GoTo 0
         End If
         Selection.EntireRow.Delete
         Cells(2, 1).Select
