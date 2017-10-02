@@ -89,11 +89,11 @@ Public Function Copy()
 End Function
 
 Public Function PastePBData(firstFreeRow As Long)
-    Range(Cells(firstFreeRow, 1), Cells(ActiveSheet.UsedRange.Rows.count, 1)).Value = Number()
-    Range(Cells(firstFreeRow, 2), Cells(ActiveSheet.UsedRange.Rows.count, 2)).Value = CC()
-    Range(Cells(firstFreeRow, 3), Cells(ActiveSheet.UsedRange.Rows.count, 3)).Value = CarrierCode()
-    Range(Cells(firstFreeRow, 4), Cells(ActiveSheet.UsedRange.Rows.count, 4)).Value = Status()
-    Range(Cells(firstFreeRow, 5), Cells(ActiveSheet.UsedRange.Rows.count, 5)).Value = Vendor()
-    Range(Cells(firstFreeRow, 6), Cells(ActiveSheet.UsedRange.Rows.count, 6)).Value = Period()
-    Range(Cells(firstFreeRow, 7), Cells(ActiveSheet.UsedRange.Rows.count, 7)).Value = CreationDate()
+    Range(Cells(firstFreeRow, 1), Cells(ActiveSheet.UsedRange.Rows.Count, 1)).Value = Number()
+    Range(Cells(firstFreeRow, 2), Cells(ActiveSheet.UsedRange.Rows.Count, 2)).Value = CC()
+    Range(Cells(firstFreeRow, 3), Cells(ActiveSheet.UsedRange.Rows.Count, 3)).Value = CarrierCode()
+    Range(Cells(firstFreeRow, 4), Cells(ActiveSheet.UsedRange.Rows.Count, 4)).Value = Status()
+    Range(Cells(firstFreeRow, 5), Cells(ActiveSheet.UsedRange.Rows.Count, 5)).Value = Vendor()
+    Range(Cells(firstFreeRow, 6), Cells(ActiveSheet.UsedRange.Rows.Count, 6)).Value = Period()
+    Range(Cells(firstFreeRow, 7), Cells(ActiveSheet.UsedRange.Rows.Count, 7)).Value = CreationDate()
 End Function

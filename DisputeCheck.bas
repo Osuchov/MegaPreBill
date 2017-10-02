@@ -42,12 +42,12 @@ Set wsDisputes = Sheets("Disputes")
 wsDisputes.Rows("1:1").AutoFilter Field:=25, Criteria1:="parked", _
     VisibleDropDown:=False
 
-Set disputeRng = wsDisputes.UsedRange.Columns(9)
+Set disputeRng = wsDisputes.UsedRange.columns(9)
 
 allDisputes = 0
 
 For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible).EntireRow
-    Shipment = Cells(parkedDispute.Row, 9).Value
+    Shipment = Cells(parkedDispute.row, 9).Value
     If Shipment <> "" Then
         allDisputes = allDisputes + 1
     Else
@@ -64,24 +64,24 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
     progress completed
 
     preBills = ""
-    Shipment = Cells(parkedDispute.Row, 9).Value
+    Shipment = Cells(parkedDispute.row, 9).Value
     If Shipment = "" Then
-        missingShipmentRow = parkedDispute.Row
+        missingShipmentRow = parkedDispute.row
         GoTo missingShipment
     End If
     
     For Each sht In arrSheets   'loop through all transport modes
-        Set lookWhere = sht.UsedRange.Columns(8)
+        Set lookWhere = sht.UsedRange.columns(8)
         Set foundWhere = lookWhere.Find(what:=Shipment, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
                 MatchCase:=False, SearchFormat:=False)
         
         If Not foundWhere Is Nothing Then
             firstFoundAddress = foundWhere.Address
-            preBills = preBills & sht.Cells(foundWhere.Row, 1).Value & " " 'lookWhere.Cells(foundWhere.Row, 1).Value & " "
+            preBills = preBills & sht.Cells(foundWhere.row, 1).Value & " " 'lookWhere.Cells(foundWhere.Row, 1).Value & " "
             Do
                 Set foundWhere = lookWhere.FindNext(foundWhere)
                 If Not foundWhere Is Nothing Then
-                    preBills = preBills & sht.Cells(foundWhere.Row, 1).Value & " "
+                    preBills = preBills & sht.Cells(foundWhere.row, 1).Value & " "
                 Else
                     Exit Do
                 End If
@@ -92,7 +92,7 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
     If Len(preBills) = 0 Then
         preBills = "not found"
     End If
-    Cells(parkedDispute.Row, 40).Value = preBills
+    Cells(parkedDispute.row, 40).Value = preBills
 
 Next parkedDispute
 

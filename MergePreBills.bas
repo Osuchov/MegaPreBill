@@ -171,17 +171,17 @@ timestamp = Format(Now(), "_yyyymmdd_hhmmss")
 End Function
 
 Function countColumns() As Long
-    countColumns = ActiveSheet.UsedRange.Columns.count
+    countColumns = ActiveSheet.UsedRange.columns.Count
 End Function
 
 Function countRows() As Long
-    countRows = ActiveSheet.UsedRange.Rows.count - 12
+    countRows = ActiveSheet.UsedRange.Rows.Count - 12
     
 End Function
 
 Function firstFree(works As Worksheet) As Long
     works.Activate
-    firstFree = ActiveSheet.UsedRange.Rows.count + 1
+    firstFree = ActiveSheet.UsedRange.Rows.Count + 1
 End Function
 
 Sub clear_all()

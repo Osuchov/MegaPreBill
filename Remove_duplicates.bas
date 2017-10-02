@@ -3,36 +3,28 @@ Sub RemoveDuplicates()
 
     Dim roadRows As Long, fclRows As Long, lclRows As Long, airRows As Long
     Dim NEWroadRows As Long, NEWfclRows As Long, NEWlclRows As Long, NEWairRows As Long
+    Dim columns As Long
+    Dim arrSheets As Variant, sht As Variant
+    Dim colArr()
+    
+    arrSheets = Array(Road, FCL, LCL, Air)
     
     roadRows = countRows(Road, 1)
     fclRows = countRows(FCL, 1)
     lclRows = countRows(LCL, 1)
     airRows = countRows(Air, 1)
     
-    Road.Select
-    Columns("A:A").Select
-    ActiveSheet.Range("$A$1:$AM$" & roadRows).RemoveDuplicates Columns:=Array(1, 2, 3, 4, 5 _
-        , 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, _
-        33, 34, 35, 36, 37, 38, 39), Header:=xlYes
-
-    FCL.Select
-    Columns("A:A").Select
-    ActiveSheet.Range("$A$1:$AP$" & fclRows).RemoveDuplicates Columns:=Array(1, 2, 3, 4, 5, _
-        6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 _
-        , 34, 35, 36, 37, 38, 39, 40, 41, 42), Header:=xlYes
-
-    LCL.Select
-    Columns("A:A").Select
-    ActiveSheet.Range("$A$1:$AQ$" & lclRows).RemoveDuplicates Columns:=Array(1, 2, 3, 4, 5, _
-        6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 _
-        , 34, 35, 36, 37, 38, 39, 40, 41, 42, 43), Header:=xlYes
-
-    Air.Select
-    Columns("A:A").Select
-    ActiveSheet.Range("$A$1:$AT$" & airRows).RemoveDuplicates Columns:=Array(1, 2, 3, 4, 5, _
-        6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 _
-        , 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46), Header:=xlYes
+    For Each sht In arrSheets
+        columns = countCols(Sheets(sht.Name), 1)  'count columns in sht
+        ReDim colArr(0 To columns - 1)
         
+        For i = 0 To columns - 1
+            colArr(i) = i + 1
+        Next i
+        
+        sht.UsedRange.RemoveDuplicates columns:=(colArr), Header:=xlYes
+    Next sht
+    
     NEWroadRows = countRows(Road, 1)
     NEWfclRows = countRows(FCL, 1)
     NEWlclRows = countRows(LCL, 1)
@@ -50,9 +42,20 @@ Function countRows(ws As Worksheet, column As Long) As Long
 'finds last used row (with header)
 
 If ws.Cells(2, column) = "" Then
-    countRows = ws.Cells(1, column).Row
+    countRows = ws.Cells(1, column).row
 Else
-    countRows = ws.Cells(1, column).End(xlDown).Row
+    countRows = ws.Cells(1, column).End(xlDown).row
+End If
+
+End Function
+
+Function countCols(ws As Worksheet, row As Long) As Long
+'finds last used column in row
+
+If ws.Cells(row, 2) = "" Then
+    countColumns = ws.Cells(row, 1).column
+Else
+    countColumns = ws.Cells(row, columns.Count).End(xlToLeft).column
 End If
 
 End Function
