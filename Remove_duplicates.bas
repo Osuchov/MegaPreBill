@@ -53,9 +53,9 @@ Function countCols(ws As Worksheet, row As Long) As Long
 'finds last used column in row
 
 If ws.Cells(row, 2) = "" Then
-    countColumns = ws.Cells(row, 1).column
+    countCols = ws.Cells(row, 1).column
 Else
-    countColumns = ws.Cells(row, columns.Count).End(xlToLeft).column
+    countCols = ws.Cells(row, columns.Count).End(xlToLeft).column
 End If
 
 End Function
