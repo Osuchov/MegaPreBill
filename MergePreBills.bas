@@ -53,28 +53,28 @@ Do Until Len(file) = 0                  'loop on files to be merged
     Set wb = Workbooks.Open(folder & file)
     Set ws = wb.Sheets(1)
 
-    Set pb = New PreBill                'setting new pre bill object with attributes from file
-    
-    pb.CC = Range("C1")                 'setting company code
-    
-    If pb.CC = "CA11" Then          'Canada new pre bill template
-        ws.Rows("9:9").Select       'Canda's template does not match pb methods - adjustment by adding 1 row
-        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
+    If Range("C1") = "CA11" Then          'Canada new pre bill template
+        'Canda's template does not match pb methods - adjustment by adding 1 row
+        ws.Rows("9:9").EntireRow.Insert Shift:=xlShiftDown
+
         If Range("B5") = "" Then
-            pbNum = 0
+            GoTo Exception          'move on to the next pre bill
         Else
             pbNum = CDbl(Range("B5"))
         End If
     Else                            'For any other company code than CA11
         If Range("B6") = "" Then    'Range("B6") can be empty with volatiles
-            pbNum = 0               'assign 0 value to a pre bill number then
+            GoTo Exception          'move on to the next pre bill
         Else
             pbNum = Range("B6")
         End If
     End If
+
+    Set pb = New PreBill                'setting new pre bill object with attributes from file
     
-    pb.Number = pbNum               'setting the rest of pre bill attributes
-    pb.CarrierCode = Range("C2")
+    pb.CC = Range("C1")                 'setting company code
+    pb.Number = pbNum
+    pb.CarrierCode = Range("C2")    'setting the rest of pre bill attributes
     pb.Status = Range("B9")
     pb.Vendor = Range("B5")
     pb.Period = Range("B3")
@@ -121,7 +121,6 @@ Exception:
     Application.CutCopyMode = False
     wb.Close False
     file = Dir
-    Application.StatusBar = False
 Loop
 
 arrSheets = Array(Road, FCL, LCL, Air, ALL)

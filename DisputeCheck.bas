@@ -37,14 +37,6 @@ Application.DisplayAlerts = False
 Application.AskToUpdateLinks = False
 Application.ScreenUpdating = False
 
-On Error Resume Next   'turn off error reporting
-For Each sht In arrSheets       'filter out volatile pre bills
-    ActiveSheet.ShowAllData
-    sht.Rows("1:1").AutoFilter Field:=1, Criteria1:="<>0", _
-            VisibleDropDown:=False
-Next sht
-On Error GoTo ErrHandling       'turning off warnings
-
 Set wb = Workbooks.Open(disputeFile)
 Set wsDisputes = Sheets("Disputes")
 wsDisputes.Rows("1:1").AutoFilter Field:=25, Criteria1:="parked", _
