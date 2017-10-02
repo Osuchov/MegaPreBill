@@ -1,33 +1,11 @@
-Attribute VB_Name = "Module1"
-Sub Macro2()
-Attribute Macro2.VB_ProcData.VB_Invoke_Func = " \n14"
-'
-' Macro2 Macro
-'
-
-'
-    Range("G2").Select
-    Application.CutCopyMode = False
-    Selection.Copy
-    Cells.Find(what:="HKD018554", After:=ActiveCell, LookIn:=xlValues, _
-        LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
-        MatchCase:=False, SearchFormat:=False).Activate
-    Cells.FindNext(After:=ActiveCell).Activate
-    Cells.FindNext(After:=ActiveCell).Activate
-    Cells.FindNext(After:=ActiveCell).Activate
-    Cells.FindNext(After:=ActiveCell).Activate
-    Sheets("Additional costs check").Select
-    Cells.FindNext(After:=ActiveCell).Activate
-    Sheets("FCL").Select
-    Cells.FindNext(After:=ActiveCell).Activate
-End Sub
-
+Attribute VB_Name = "ExportFiles"
 Public Sub ExportSourceFiles()
+'macro exporting all VBA components to a destination folder
 
 Dim destPath As String
 Dim component As VBComponent
 
-destPath = "C:\Users\PH325251\Desktop\VBA\Git\MegaPreBill\"
+destPath = pickDir("Pick the directory to export source files", "Export")
 
 For Each component In Application.VBE.ActiveVBProject.VBComponents
 If component.Type = vbext_ct_ClassModule Or component.Type = vbext_ct_StdModule Then

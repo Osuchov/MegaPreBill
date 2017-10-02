@@ -85,7 +85,7 @@ Do Until Len(file) = 0                  'loop on files to be merged
     
     pb.Copy                         'copying of pre bill atributes
     
-    If pb.Mode = "Road" Or pb.Mode = "Road Azkar" Then  'determining transport mode (pre bill template)
+    If pb.Mode = "Road" Or pb.Mode = "Road Azkar" Or pb.Mode = "Road US" Then  'determining transport mode (pre bill template)
         fFree = firstFree(wsRoad)                       'checking first free cell in the correct sheet
         Set target = wsRoad.Cells(fFree, 8)             'setting pasting target
     ElseIf pb.Mode = "FCL" Or pb.Mode = "Sea" Then
