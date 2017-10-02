@@ -1,7 +1,7 @@
-Attribute VB_Name = "AC_check"
+Attribute VB_Name = "AdditionalCostsCheck"
 Option Explicit
 
-Public Sub ACcheck()
+Public Sub CheckAC()
 Dim Shipment, shipments As Range
 Dim srcShipment As String
 

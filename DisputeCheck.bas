@@ -13,10 +13,14 @@ Dim Shipment As String
 Dim arrSheets As Variant, sht As Variant
 Dim lookWhere As Range, foundWhere As Range
 Dim firstFoundAddress As String
-Dim preBills As String
+'Dim preBills As String
+Dim preBills()
+Dim uniquePreBills As New Collection, a
 Dim missingShipmentRow As Long
 Dim counter As Long, allDisputes As Long
 Dim completed As Single
+Dim strPreBills As String
+Dim i As Integer
 
 arrSheets = Array(Road, FCL, LCL, Air)
 
@@ -39,7 +43,7 @@ Application.ScreenUpdating = False
 
 Set wb = Workbooks.Open(disputeFile)
 Set wsDisputes = Sheets("Disputes")
-wsDisputes.Rows("1:1").AutoFilter Field:=25, Criteria1:="parked", _
+wsDisputes.rows("1:1").AutoFilter Field:=25, Criteria1:="parked", _
     VisibleDropDown:=False
 
 Set disputeRng = wsDisputes.UsedRange.columns(9)
@@ -63,12 +67,14 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
     completed = Round((counter * 100) / allDisputes, 0)
     progress completed
 
-    preBills = ""
+    'preBills = ""
     Shipment = Cells(parkedDispute.row, 9).Value
     If Shipment = "" Then
         missingShipmentRow = parkedDispute.row
         GoTo missingShipment
     End If
+    
+    ReDim preBills(0 To 0)      'resetting found preBills array
     
     For Each sht In arrSheets   'loop through all transport modes
         Set lookWhere = sht.UsedRange.columns(8)
@@ -77,11 +83,16 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
         
         If Not foundWhere Is Nothing Then
             firstFoundAddress = foundWhere.Address
-            preBills = preBills & sht.Cells(foundWhere.row, 1).Value & " " 'lookWhere.Cells(foundWhere.Row, 1).Value & " "
+            'preBills = preBills & sht.Cells(foundWhere.row, 1).Value & " " 'lookWhere.Cells(foundWhere.Row, 1).Value & " "
+
+            preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value     'Allocate first element
+                     
             Do
                 Set foundWhere = lookWhere.FindNext(foundWhere)
                 If Not foundWhere Is Nothing Then
-                    preBills = preBills & sht.Cells(foundWhere.row, 1).Value & " "
+                    'preBills = preBills & sht.Cells(foundWhere.row, 1).Value & " "
+                    ReDim Preserve preBills(0 To UBound(preBills) + 1)              'Allocate next element
+                    preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value 'Assign the array element
                 Else
                     Exit Do
                 End If
@@ -89,11 +100,30 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
         End If
     Next sht
     
-    If Len(preBills) = 0 Then
-        preBills = "not found"
+    'ReDim Preserve preBills(LBound(preBills) To UBound(preBills) - 1)  'Deallocate the last, unused element
+    
+    On Error Resume Next
+    For Each a In preBills
+        If Not IsEmpty(a) Then
+            uniquePreBills.Add a, Str(a)
+        End If
+    Next a
+    On Error GoTo ErrHandling
+    
+    strPreBills = ""
+    
+    If uniquePreBills.Count = 0 Then
+        strPreBills = "not found"
+    ElseIf uniquePreBills.Count = 1 Then
+        strPreBills = uniquePreBills.item(1)
+    Else
+        For i = 1 To uniquePreBills.Count
+            strPreBills = (CStr(uniquePreBills.item(i))) & " " & strPreBills
+        Next i
     End If
-    Cells(parkedDispute.row, 40).Value = preBills
-
+    
+    Cells(parkedDispute.row, 40).Value = strPreBills
+    Set uniquePreBills = Nothing                    'clearing uniquePreBills collection
 Next parkedDispute
 
 
@@ -115,7 +145,7 @@ missingShipment:
     Application.ScreenUpdating = True
     
     Unload UserForm2
-    MsgBox "Shipment in " & missingShipmentRow & " is missing. Check if that is the end of the file."
+    MsgBox "Shipment in row " & missingShipmentRow & " is missing. Check if that is the end of the file."
     Exit Sub
 End Sub
 

@@ -55,7 +55,7 @@ Do Until Len(file) = 0                  'loop on files to be merged
 
     If Range("C1") = "CA11" Then          'Canada new pre bill template
         'Canda's template does not match pb methods - adjustment by adding 1 row
-        ws.Rows("9:9").EntireRow.Insert Shift:=xlShiftDown
+        ws.rows("9:9").EntireRow.Insert Shift:=xlShiftDown
 
         If Range("B5") = "" Then
             GoTo Exception          'move on to the next pre bill
@@ -175,13 +175,13 @@ Function countColumns() As Long
 End Function
 
 Function countRows() As Long
-    countRows = ActiveSheet.UsedRange.Rows.Count - 12
+    countRows = ActiveSheet.UsedRange.rows.Count - 12
     
 End Function
 
 Function firstFree(works As Worksheet) As Long
     works.Activate
-    firstFree = ActiveSheet.UsedRange.Rows.Count + 1
+    firstFree = ActiveSheet.UsedRange.rows.Count + 1
 End Function
 
 Sub clear_all()
