@@ -10,6 +10,7 @@ Attribute VB_Exposed = False
 Private pNumber As Double
 Private pCc As String
 Private pCarrierCode As String
+Private pCarrierName As String
 Private pStatus As String
 Private pVendor As String
 Private pPeriod As String
@@ -27,6 +28,9 @@ Public Property Get CC() As String
 End Property
 Public Property Get CarrierCode() As String
     CarrierCode = pCarrierCode
+End Property
+Public Property Get CarrierName() As String
+    CarrierName = pCarrierName
 End Property
 Public Property Get Status() As String
     Status = pStatus
@@ -60,6 +64,9 @@ End Property
 Public Property Let CarrierCode(CCode As String)
     pCarrierCode = CCode
 End Property
+Public Property Let CarrierName(CName As String)
+    pCarrierName = CName
+End Property
 Public Property Let Status(stat As String)
     pStatus = stat
 End Property
@@ -82,18 +89,19 @@ Public Property Let Mode(transMode As String)
     pMode = transMode
 End Property
 
-Public Function Copy()
+Public Function Copy()              'copying the pre bill table
     Set pbBody = Range(Cells(12, 1), Cells((NumberOfRows + 11), NumberOfColumns))
     pbBody.Select
     Selection.Copy
 End Function
 
-Public Function PastePBData(firstFreeRow As Long)
+Public Function PastePBData(firstFreeRow As Long)   'pasting the pre bill table
     Range(Cells(firstFreeRow, 1), Cells(ActiveSheet.UsedRange.rows.Count, 1)).Value = Number()
     Range(Cells(firstFreeRow, 2), Cells(ActiveSheet.UsedRange.rows.Count, 2)).Value = CC()
     Range(Cells(firstFreeRow, 3), Cells(ActiveSheet.UsedRange.rows.Count, 3)).Value = CarrierCode()
-    Range(Cells(firstFreeRow, 4), Cells(ActiveSheet.UsedRange.rows.Count, 4)).Value = Status()
-    Range(Cells(firstFreeRow, 5), Cells(ActiveSheet.UsedRange.rows.Count, 5)).Value = Vendor()
-    Range(Cells(firstFreeRow, 6), Cells(ActiveSheet.UsedRange.rows.Count, 6)).Value = Period()
-    Range(Cells(firstFreeRow, 7), Cells(ActiveSheet.UsedRange.rows.Count, 7)).Value = CreationDate()
+    Range(Cells(firstFreeRow, 4), Cells(ActiveSheet.UsedRange.rows.Count, 4)).Value = CarrierName()
+    Range(Cells(firstFreeRow, 5), Cells(ActiveSheet.UsedRange.rows.Count, 5)).Value = Status()
+    Range(Cells(firstFreeRow, 6), Cells(ActiveSheet.UsedRange.rows.Count, 6)).Value = Vendor()
+    Range(Cells(firstFreeRow, 7), Cells(ActiveSheet.UsedRange.rows.Count, 7)).Value = Period()
+    Range(Cells(firstFreeRow, 8), Cells(ActiveSheet.UsedRange.rows.Count, 8)).Value = CreationDate()
 End Function

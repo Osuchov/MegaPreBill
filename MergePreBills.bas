@@ -75,6 +75,7 @@ Do Until Len(file) = 0                  'loop on files to be merged
     pb.CC = Range("C1")                 'setting company code
     pb.Number = pbNum
     pb.CarrierCode = Range("C2")    'setting the rest of pre bill attributes
+    pb.CarrierName = Range("B2")
     pb.Status = Range("B9")
     pb.Vendor = Range("B5")
     pb.Period = Range("B3")
@@ -87,16 +88,16 @@ Do Until Len(file) = 0                  'loop on files to be merged
     
     If pb.Mode = "Road" Or pb.Mode = "Road Azkar" Or pb.Mode = "Road US" Then  'determining transport mode (pre bill template)
         fFree = firstFree(wsRoad)                       'checking first free cell in the correct sheet
-        Set target = wsRoad.Cells(fFree, 8)             'setting pasting target
+        Set target = wsRoad.Cells(fFree, 9)             'setting pasting target
     ElseIf pb.Mode = "FCL" Or pb.Mode = "Sea" Then
         fFree = firstFree(wsFCL)
-        Set target = wsFCL.Cells(fFree, 8)
+        Set target = wsFCL.Cells(fFree, 9)
     ElseIf pb.Mode = "Air" Or pb.Mode = "Air 2" Then
         fFree = firstFree(wsAir)
-        Set target = wsAir.Cells(fFree, 8)
+        Set target = wsAir.Cells(fFree, 9)
     ElseIf pb.Mode = "Sea LCL" Then
         fFree = firstFree(wsLCL)
-        Set target = wsLCL.Cells(firstFree(wsLCL), 8)
+        Set target = wsLCL.Cells(firstFree(wsLCL), 9)
     Else
         MsgBox "WARNING! This workbook contains an unknown transport mode name: " & pb.Mode _
         & " Pre bill " & pb.Number & " (" & pb.CarrierCode & "/" & pb.CC & ") will not be merged!"

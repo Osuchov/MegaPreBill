@@ -9,7 +9,7 @@ Dim wsDisputes As Worksheet
 Dim disputeFile As String
 Dim disputeRng As Range
 Dim parkedDispute As Range
-Dim Shipment As String
+Dim Shipment, Carrier As String
 Dim arrSheets As Variant, sht As Variant
 Dim lookWhere As Range, foundWhere As Range
 Dim firstFoundAddress As String
@@ -20,6 +20,7 @@ Dim counter As Long, allDisputes As Long
 Dim completed As Single
 Dim strPreBills As String
 Dim i As Integer
+Dim GeneralCN As String
 
 arrSheets = Array(Road, FCL, LCL, Air)
 
@@ -73,6 +74,8 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
     progress completed
 
     Shipment = Cells(parkedDispute.row, 9).Value        'get shipment number for find function
+    Carrier = Cells(parkedDispute.row, 8).Value        'get carrier name of the dispute
+    
     If Shipment = "" Then
         missingShipmentRow = parkedDispute.row
         GoTo missingShipment
@@ -81,23 +84,32 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
     ReDim preBills(0 To 0)      'resetting found preBills array
     
     For Each sht In arrSheets   'loop through all transport modes
-        Set lookWhere = sht.UsedRange.columns(8)
+        Set lookWhere = sht.UsedRange.columns(9)    'shipment number is in column 9
         Set foundWhere = lookWhere.Find(what:=Shipment, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
                 MatchCase:=False, SearchFormat:=False)
         
         If Not foundWhere Is Nothing Then   'if found
-            firstFoundAddress = foundWhere.Address  'remember first found address
-            preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value     'allocate first found element
-                     
-            Do  'loop for FindNext until found address = first found address
-                Set foundWhere = lookWhere.FindNext(foundWhere)
-                If Not foundWhere Is Nothing Then   'if found again
-                    ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
-                    preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value 'assign it to the array
-                Else
-                    Exit Do                         'if not found again
+                GeneralCN = GeneralCarrierName(foundWhere.Offset(0, -5).Value) 'check the carrier with carrier name pattern
+        
+                If Carrier Like "*" & GeneralCN & "*" Then
+                    firstFoundAddress = foundWhere.Address  'remember first found address
+                    preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value     'allocate first found element
+                             
+                    Do  'loop for FindNext until found address = first found address
+                        Set foundWhere = lookWhere.FindNext(foundWhere)
+                        
+                        If Not foundWhere Is Nothing Then    'if found again with correct carrier
+                            If Carrier Like "*" & GeneralCN & "*" Then
+                                 GeneralCN = GeneralCarrierName(foundWhere.Offset(0, -5).Value)
+                                 ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
+                                preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value 'assign it to the array
+                            End If
+                        Else
+                            Exit Do                         'if not found again
+                        End If
+                    Loop While foundWhere.Address <> firstFoundAddress
                 End If
-            Loop While foundWhere.Address <> firstFoundAddress
+        
         End If
     Next sht
     
@@ -121,7 +133,7 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
         Next i
     End If
     
-    Cells(parkedDispute.row, 34).Value = strPreBills        'write found pre bills in Excel
+    Cells(parkedDispute.row, 36).Value = strPreBills        'write found pre bills in Excel
     Set uniquePreBills = Nothing                            'clear uniquePreBills collection
 Next parkedDispute
 
@@ -154,4 +166,29 @@ UserForm2.Bar.Width = completed * 2
 
 DoEvents
 
+End Sub
+
+Function GeneralCarrierName(FullCarrierName As String) As String 'returns a general carrier name from full carrier name
+Dim translation As Range
+
+With ThisWorkbook.Worksheets("Mapping")
+    Set translation = .Range(.Cells(10, 1), .Cells(103, 3))
+End With
+
+On Error GoTo NotFound
+GeneralCarrierName = Application.WorksheetFunction.VLookup(FullCarrierName, translation, 3, 0)
+On Error GoTo 0
+
+Exit Function
+
+NotFound:
+GeneralCarrierName = FullCarrierName
+
+End Function
+
+Sub elo()
+Dim test As String
+
+
+test = GeneralCarrierName("CEVA Transport Italy")
 End Sub
