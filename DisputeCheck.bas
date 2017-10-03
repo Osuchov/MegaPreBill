@@ -13,7 +13,6 @@ Dim Shipment As String
 Dim arrSheets As Variant, sht As Variant
 Dim lookWhere As Range, foundWhere As Range
 Dim firstFoundAddress As String
-'Dim preBills As String
 Dim preBills()
 Dim uniquePreBills As New Collection, a
 Dim missingShipmentRow As Long
@@ -42,14 +41,20 @@ Application.AskToUpdateLinks = False
 Application.ScreenUpdating = False
 
 Set wb = Workbooks.Open(disputeFile)
+
+If wb.Sheets(1).Name <> "Disputes" Then     'checks if 1st sheet is called "Disputes"
+    MsgBox "This is not a valid dispute file. Check it and run macro again."
+    GoTo CleaningUp
+End If
+
 Set wsDisputes = Sheets("Disputes")
-wsDisputes.rows("1:1").AutoFilter Field:=25, Criteria1:="parked", _
-    VisibleDropDown:=False
+wsDisputes.rows("1:1").AutoFilter Field:=25, Criteria1:="parked" 'filters parked disputes
 
-Set disputeRng = wsDisputes.UsedRange.columns(9)
+Set disputeRng = wsDisputes.UsedRange.columns(9)    'shipment number is in column 9
 
-allDisputes = 0
+allDisputes = 0                                     'dispute counter
 
+'loop counts how many disputes are parked
 For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible).EntireRow
     Shipment = Cells(parkedDispute.row, 9).Value
     If Shipment <> "" Then
@@ -59,16 +64,15 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
     End If
 Next parkedDispute
 
-counter = 0
+counter = 0         'loop counter
 
 'loop on all disputes (shipment numbers)
 For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible).EntireRow
     counter = counter + 1
-    completed = Round((counter * 100) / allDisputes, 0)
+    completed = Round((counter * 100) / allDisputes, 0) 'for progress bar
     progress completed
 
-    'preBills = ""
-    Shipment = Cells(parkedDispute.row, 9).Value
+    Shipment = Cells(parkedDispute.row, 9).Value        'get shipment number for find function
     If Shipment = "" Then
         missingShipmentRow = parkedDispute.row
         GoTo missingShipment
@@ -81,49 +85,44 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
         Set foundWhere = lookWhere.Find(what:=Shipment, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
                 MatchCase:=False, SearchFormat:=False)
         
-        If Not foundWhere Is Nothing Then
-            firstFoundAddress = foundWhere.Address
-            'preBills = preBills & sht.Cells(foundWhere.row, 1).Value & " " 'lookWhere.Cells(foundWhere.Row, 1).Value & " "
-
-            preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value     'Allocate first element
+        If Not foundWhere Is Nothing Then   'if found
+            firstFoundAddress = foundWhere.Address  'remember first found address
+            preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value     'allocate first found element
                      
-            Do
+            Do  'loop for FindNext until found address = first found address
                 Set foundWhere = lookWhere.FindNext(foundWhere)
-                If Not foundWhere Is Nothing Then
-                    'preBills = preBills & sht.Cells(foundWhere.row, 1).Value & " "
-                    ReDim Preserve preBills(0 To UBound(preBills) + 1)              'Allocate next element
-                    preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value 'Assign the array element
+                If Not foundWhere Is Nothing Then   'if found again
+                    ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
+                    preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value 'assign it to the array
                 Else
-                    Exit Do
+                    Exit Do                         'if not found again
                 End If
             Loop While foundWhere.Address <> firstFoundAddress
         End If
     Next sht
     
-    'ReDim Preserve preBills(LBound(preBills) To UBound(preBills) - 1)  'Deallocate the last, unused element
-    
     On Error Resume Next
-    For Each a In preBills
+    For Each a In preBills      'creating unique pre bill collection
         If Not IsEmpty(a) Then
             uniquePreBills.Add a, Str(a)
         End If
     Next a
     On Error GoTo ErrHandling
     
-    strPreBills = ""
+    strPreBills = ""            'found pre bill collection to array
     
     If uniquePreBills.Count = 0 Then
-        strPreBills = "not found"
+        strPreBills = "not found"               'if collection is empty
     ElseIf uniquePreBills.Count = 1 Then
-        strPreBills = uniquePreBills.item(1)
+        strPreBills = uniquePreBills.item(1)    'if there's 1 item in collection
     Else
         For i = 1 To uniquePreBills.Count
-            strPreBills = (CStr(uniquePreBills.item(i))) & " " & strPreBills
+            strPreBills = (CStr(uniquePreBills.item(i))) & " " & strPreBills    'if there's more items
         Next i
     End If
     
-    Cells(parkedDispute.row, 40).Value = strPreBills
-    Set uniquePreBills = Nothing                    'clearing uniquePreBills collection
+    Cells(parkedDispute.row, 34).Value = strPreBills        'write found pre bills in Excel
+    Set uniquePreBills = Nothing                            'clear uniquePreBills collection
 Next parkedDispute
 
 
