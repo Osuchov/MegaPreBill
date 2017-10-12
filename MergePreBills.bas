@@ -52,22 +52,11 @@ Do Until Len(file) = 0                  'loop on files to be merged
         
     Set wb = Workbooks.Open(folder & file)
     Set ws = wb.Sheets(1)
-
-    If Range("C1") = "CA11" Then          'Canada new pre bill template
-        'Canda's template does not match pb methods - adjustment by adding 1 row
-        ws.rows("9:9").EntireRow.Insert Shift:=xlShiftDown
-
-        If Range("B5") = "" Then
-            GoTo Exception          'move on to the next pre bill
-        Else
-            pbNum = CDbl(Range("B5"))
-        End If
-    Else                            'For any other company code than CA11
-        If Range("B6") = "" Then    'Range("B6") can be empty with volatiles
-            GoTo Exception          'move on to the next pre bill
-        Else
-            pbNum = Range("B6")
-        End If
+    
+    If Range("B6") = "" Then    'Range("B6") can be empty with volatiles
+        GoTo Exception          'move on to the next pre bill
+    Else
+        pbNum = Range("B6")
     End If
 
     Set pb = New PreBill                'setting new pre bill object with attributes from file
