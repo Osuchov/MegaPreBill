@@ -7,9 +7,10 @@ Sub RemoveDuplicates()
     Dim arrSheets As Variant, sht As Variant
     Dim colArr()
     
-    arrSheets = Array(Road, FCL, LCL, Air)
+    arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
     
     roadRows = countRows(Road, 1)
+    roadUSRows = countRowsUS(RoadUS, 1)
     fclRows = countRows(FCL, 1)
     lclRows = countRows(LCL, 1)
     airRows = countRows(Air, 1)
@@ -26,12 +27,14 @@ Sub RemoveDuplicates()
     Next sht
     
     NEWroadRows = countRows(Road, 1)
+    NEWroadUSRows = countRows(RoadUS, 1)
     NEWfclRows = countRows(FCL, 1)
     NEWlclRows = countRows(LCL, 1)
     NEWairRows = countRows(Air, 1)
 
 MsgBox "Remove duplicates finished." & Chr(13) _
         & "Road duplicates: " & roadRows - NEWroadRows & Chr(13) _
+        & "Road US duplicates: " & roadUSRows - NEWroadUSRows & Chr(13) _
         & "FCL duplicates: " & fclRows - NEWfclRows & Chr(13) _
         & "LCL duplicates: " & lclRows - NEWlclRows & Chr(13) _
         & "Air duplicates: " & airRows - NEWairRows & Chr(13)

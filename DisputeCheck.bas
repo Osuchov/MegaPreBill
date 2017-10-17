@@ -22,7 +22,7 @@ Dim strPreBills As String
 Dim i As Integer
 Dim GeneralCN As String
 
-arrSheets = Array(Road, FCL, LCL, Air)
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
 
 Set fd = Application.FileDialog(msoFileDialogFilePicker)
 

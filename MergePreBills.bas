@@ -4,7 +4,7 @@ Option Explicit
 Sub Merge()
 
 Dim ws As Worksheet
-Dim wsRoad As Worksheet, wsFCL As Worksheet, wsLCL As Worksheet, wsAir As Worksheet, wsALL As Worksheet
+Dim wsRoad As Worksheet, wsFCL As Worksheet, wsLCL As Worksheet, wsAir As Worksheet, wsRoadUS As Worksheet, wsALL As Worksheet
 Dim wsCons As Worksheet 'consolidated worksheet
 Dim file As String
 Dim wb As Workbook
@@ -30,6 +30,7 @@ Application.ScreenUpdating = False
 
 Set wbMerge = Application.ThisWorkbook  'naming sheets
 Set wsRoad = wbMerge.Sheets("Road")
+Set wsRoadUS = wbMerge.Sheets("Road US")
 Set wsFCL = wbMerge.Sheets("FCL")
 Set wsLCL = wbMerge.Sheets("LCL")
 Set wsAir = wbMerge.Sheets("Air")
@@ -56,7 +57,7 @@ Do Until Len(file) = 0                  'loop on files to be merged
     If Range("B6") = "" Then    'Range("B6") can be empty with volatiles
         GoTo Exception          'move on to the next pre bill
     Else
-        pbNum = Range("B6")
+        pbNum = CDbl(Range("B6"))
     End If
 
     Set pb = New PreBill                'setting new pre bill object with attributes from file
@@ -75,9 +76,12 @@ Do Until Len(file) = 0                  'loop on files to be merged
     
     pb.Copy                         'copying of pre bill atributes
     
-    If pb.Mode = "Road" Or pb.Mode = "Road Azkar" Or pb.Mode = "Road US" Then  'determining transport mode (pre bill template)
+    If pb.Mode = "Road" Or pb.Mode = "Road Azkar" Then  'determining transport mode (pre bill template)
         fFree = firstFree(wsRoad)                       'checking first free cell in the correct sheet
         Set target = wsRoad.Cells(fFree, 9)             'setting pasting target
+    ElseIf pb.Mode = "Road US" Then                     'teamplate for US Road pre bills (e.g. CA11)
+        fFree = firstFree(wsRoadUS)
+        Set target = wsRoadUS.Cells(fFree, 9)
     ElseIf pb.Mode = "FCL" Or pb.Mode = "Sea" Then
         fFree = firstFree(wsFCL)
         Set target = wsFCL.Cells(fFree, 9)
@@ -113,7 +117,7 @@ Exception:
     file = Dir
 Loop
 
-arrSheets = Array(Road, FCL, LCL, Air, ALL)
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air, ALL)
 
 For Each sht In arrSheets
     sht.UsedRange.WrapText = False
@@ -182,7 +186,7 @@ Dim sht As Variant
 mb = MsgBox("You are about to clear all data from pre bill sheets." & Chr(13) & "Are you sure?", vbOKCancel + vbQuestion)
 
 If mb = 1 Then
-    arrSheets = Array(Road, FCL, LCL, Air, ALL)
+    arrSheets = Array(Road, RoadUS, FCL, LCL, Air, ALL)
     
     For Each sht In arrSheets
         If sht.Name = "ALL" Then
