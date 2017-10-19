@@ -185,10 +185,3 @@ NotFound:
 GeneralCarrierName = FullCarrierName
 
 End Function
-
-Sub elo()
-Dim test As String
-
-
-test = GeneralCarrierName("CEVA Transport Italy")
-End Sub
