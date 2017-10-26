@@ -144,7 +144,7 @@ Function pickDir(winTitle As String, buttonTitle As String) As String
 Dim window As FileDialog
 Dim picked As String
 
-Set window = Application.FileDialog(msoFileDialogdirectoryPicker)
+Set window = Application.FileDialog(msoFileDialogFolderPicker)
 window.Title = winTitle
 window.ButtonName = buttonTitle
 
