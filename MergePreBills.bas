@@ -9,7 +9,7 @@ Dim wsCons As Worksheet 'consolidated worksheet
 Dim file As String
 Dim wb As Workbook
 Dim wbMerge As Workbook
-Dim folder As String
+Dim directory As String
 Dim counter As Long, allFiles As Long
 Dim target As Range     'where to paste
 Dim pb As PreBill
@@ -19,10 +19,12 @@ Dim sht As Variant
 Dim arrSheets As Variant
 Dim completed As Single
 
-folder = pickDir("Pick the directory with Excel files to merge", "Merge")
+directory = pickDir("Pick the directory with Excel files to merge", "Merge")
 
-If Len(folder) = 0 Then
-    MsgBox "Folder not picked. Exiting...", vbExclamation
+If Len(directory) = 0 Then
+    MsgBox "Directory not picked. Exiting...", vbExclamation
+    Unload UserForm1
+    Application.ScreenUpdating = True
     Exit Sub
 End If
 
@@ -36,7 +38,7 @@ Set wsLCL = wbMerge.Sheets("LCL")
 Set wsAir = wbMerge.Sheets("Air")
 Set wsALL = wbMerge.Sheets("ALL")
 
-file = Dir(folder & "*.xls")
+file = Dir(directory & "*.xls")
 allFiles = 0
 
 Do While file <> ""
@@ -44,14 +46,14 @@ Do While file <> ""
     file = Dir()
 Loop
 
-file = Dir(folder & "*.xls")
+file = Dir(directory & "*.xls")
 
 Do Until Len(file) = 0                  'loop on files to be merged
     counter = counter + 1
     completed = Round((counter * 100) / allFiles, 0)
     progress completed
         
-    Set wb = Workbooks.Open(folder & file)
+    Set wb = Workbooks.Open(directory & file)
     Set ws = wb.Sheets(1)
     
     If Range("B6") = "" Then    'Range("B6") can be empty with volatiles
@@ -142,7 +144,7 @@ Function pickDir(winTitle As String, buttonTitle As String) As String
 Dim window As FileDialog
 Dim picked As String
 
-Set window = Application.FileDialog(msoFileDialogFolderPicker)
+Set window = Application.FileDialog(msoFileDialogdirectoryPicker)
 window.Title = winTitle
 window.ButtonName = buttonTitle
 
