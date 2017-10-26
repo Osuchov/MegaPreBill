@@ -74,6 +74,7 @@ Do Until Len(file) = 0                  'loop on files to be merged
     pb.CreationDate = Range("B7")
     pb.NumberOfColumns = countColumns()
     pb.NumberOfRows = countRows()
+    pb.StartRow = findStartRow()
     pb.Mode = ws.Name
     
     pb.Copy                         'copying of pre bill atributes
@@ -171,8 +172,26 @@ Function countColumns() As Long
 End Function
 
 Function countRows() As Long
-    countRows = ActiveSheet.UsedRange.rows.Count - 12
+
+Dim startPBBodyRow As Long
+
+startPBBodyRow = findStartRow()
+countRows = ActiveSheet.UsedRange.rows.Count - startPBBodyRow
     
+End Function
+
+Function findStartRow() As Long
+Dim cell As Range
+
+findStartRow = 12   'by default starting row should be 12. If it is not, the loop will find it
+
+For Each cell In ActiveSheet.Range("A:A").Cells
+    If cell.Value = "Referencenr" Then
+        findStartRow = cell.row + 1
+        Exit For
+    End If
+Next cell
+
 End Function
 
 Function firstFree(works As Worksheet) As Long

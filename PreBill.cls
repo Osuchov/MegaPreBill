@@ -17,6 +17,7 @@ Private pPeriod As String
 Private pCreationDate As String
 Private pNumberOfColumns As Long
 Private pNumberOfRows As Long
+Private pStartRow As Long
 Private pMode As String
 
 'Getters
@@ -49,6 +50,9 @@ Public Property Get NumberOfColumns() As Long
 End Property
 Public Property Get NumberOfRows() As Long
     NumberOfRows = pNumberOfRows
+End Property
+Public Property Get StartRow() As Long
+    StartRow = pStartRow
 End Property
 Public Property Get Mode() As String
     Mode = pMode
@@ -85,12 +89,15 @@ End Property
 Public Property Let NumberOfRows(rowNum As Long)
     pNumberOfRows = rowNum
 End Property
+Public Property Let StartRow(rowNum As Long)
+    pStartRow = rowNum
+End Property
 Public Property Let Mode(transMode As String)
     pMode = transMode
 End Property
 
 Public Function Copy()              'copying the pre bill table
-    Set pbBody = Range(Cells(12, 1), Cells((NumberOfRows + 11), NumberOfColumns))
+    Set pbBody = Range(Cells(StartRow, 1), Cells((NumberOfRows + StartRow - 1), NumberOfColumns))
     pbBody.Select
     Selection.Copy
 End Function
