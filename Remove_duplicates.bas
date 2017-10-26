@@ -10,7 +10,7 @@ Sub RemoveDuplicates()
     arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
     
     roadRows = countRows(Road, 1)
-    roadUSRows = countRowsUS(RoadUS, 1)
+    roadUSRows = countRows(RoadUS, 1)
     fclRows = countRows(FCL, 1)
     lclRows = countRows(LCL, 1)
     airRows = countRows(Air, 1)
