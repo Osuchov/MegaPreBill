@@ -57,7 +57,7 @@ allDisputes = 0                                     'dispute counter
 
 'loop counts how many disputes are parked
 For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible).EntireRow
-    Shipment = Cells(parkedDispute.row, 9).Value
+    Shipment = Trim(Cells(parkedDispute.row, 9).Value)
     If Shipment <> "" Then
         allDisputes = allDisputes + 1
     Else
@@ -170,9 +170,21 @@ End Sub
 
 Function GeneralCarrierName(FullCarrierName As String) As String 'returns a general carrier name from full carrier name
 Dim translation As Range
+Dim cell As Range
+Dim firstRow As Long
+Dim lastRow As Long
+
+firstRow = 10
+For Each cell In ThisWorkbook.Worksheets("Mapping").Range("A:A").Cells
+    If cell.Value = "Carrier full name" Then
+        firstRow = cell.row
+        Exit For
+    End If
+Next cell
 
 With ThisWorkbook.Worksheets("Mapping")
-    Set translation = .Range(.Cells(10, 1), .Cells(103, 3))
+    lastRow = .UsedRange.rows.Count
+    Set translation = .Range(.Cells(firstRow, 1), .Cells(lastRow, 3))
 End With
 
 On Error GoTo NotFound
