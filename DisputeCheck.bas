@@ -57,7 +57,7 @@ allDisputes = 0                                     'dispute counter
 
 'loop counts how many disputes are parked
 For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible).EntireRow
-    Shipment = Trim(Cells(parkedDispute.row, 9).Value)
+    Shipment = Cells(parkedDispute.row, 9).Value
     If Shipment <> "" Then
         allDisputes = allDisputes + 1
     Else
@@ -73,8 +73,8 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
     completed = Round((counter * 100) / allDisputes, 0) 'for progress bar
     progress completed
 
-    Shipment = Cells(parkedDispute.row, 9).Value        'get shipment number for find function
-    Carrier = Cells(parkedDispute.row, 8).Value        'get carrier name of the dispute
+    Shipment = Trim(Cells(parkedDispute.row, 9).Value)        'get shipment number for find function
+    Carrier = Trim(Cells(parkedDispute.row, 8).Value)        'get carrier name of the dispute
     
     If Shipment = "" Then
         missingShipmentRow = parkedDispute.row
@@ -91,7 +91,7 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
         If Not foundWhere Is Nothing Then   'if found
                 GeneralCN = GeneralCarrierName(foundWhere.Offset(0, -5).Value) 'check the carrier with carrier name pattern
         
-                If Carrier Like "*" & GeneralCN & "*" Then
+                If LCase(Carrier) Like LCase("*" & GeneralCN & "*") Then
                     firstFoundAddress = foundWhere.Address  'remember first found address
                     preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value     'allocate first found element
                              
