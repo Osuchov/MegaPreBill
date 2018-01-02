@@ -126,10 +126,10 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
     If uniquePreBills.Count = 0 Then
         strPreBills = "not found"               'if collection is empty
     ElseIf uniquePreBills.Count = 1 Then
-        strPreBills = uniquePreBills.item(1)    'if there's 1 item in collection
+        strPreBills = uniquePreBills.Item(1)    'if there's 1 item in collection
     Else
         For i = 1 To uniquePreBills.Count
-            strPreBills = (CStr(uniquePreBills.item(i))) & " " & strPreBills    'if there's more items
+            strPreBills = (CStr(uniquePreBills.Item(i))) & " " & strPreBills    'if there's more items
         Next i
     End If
     

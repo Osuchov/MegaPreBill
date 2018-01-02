@@ -127,7 +127,7 @@ Exception:
     file = Dir
 Loop
 
-arrSheets = Array(Road, RoadUS, FCL, LCL, Air, ALL)
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air, ALL, check)
 
 For Each sht In arrSheets
     sht.UsedRange.WrapText = False
@@ -144,6 +144,67 @@ UserForm1.Text.Caption = completed & "% Completed"
 UserForm1.Bar.Width = completed * 2
 
 DoEvents
+
+End Sub
+
+
+Sub clear_all()
+Dim mb As Integer
+Dim arrSheets As Variant
+Dim sht As Variant
+
+mb = MsgBox("You are about to clear all data from pre bill sheets." & Chr(13) & "Are you sure?", vbOKCancel + vbQuestion)
+
+If mb = 1 Then
+    arrSheets = Array(Road, RoadUS, FCL, LCL, Air, ALL, check)
+    
+    For Each sht In arrSheets
+        If sht.Name = "ALL" Then
+            sht.Activate
+            sht.UsedRange.Select
+        Else
+            On Error Resume Next   'turn off error reporting
+            ActiveSheet.ShowAllData
+            sht.Activate
+            sht.UsedRange.Offset(1).Select
+            On Error GoTo 0
+        End If
+        Selection.EntireRow.Delete
+        Cells(2, 1).Select
+    Next sht
+    
+    MsgBox "Pre bill sheets are now empty."
+Else
+    MsgBox "Macro cancelled."
+End If
+
+End Sub
+
+Sub CountGeneratedPreBills()
+Dim arrSheets As Variant, sht As Variant
+Dim check As Worksheet
+Dim target As Range
+
+'Application.ScreenUpdating = False
+
+Set check = Sheets("Check")
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
+
+For Each sht In arrSheets
+    Set target = check.Cells(countRowz(check, 1) + 1, 1)
+    sht.Activate
+    sht.Range(Cells(2, 1), Cells(countRowz(Sheets(sht.Name), 1) + 1, 1)).Select
+    Selection.Copy
+    target.PasteSpecial Paste:=xlPasteValuesAndNumberFormats
+Next sht
+
+check.UsedRange.RemoveDuplicates columns:=(1), Header:=xlYes
+check.Activate
+check.Range("A1").Select
+
+Application.ScreenUpdating = True
+
+MsgBox ("There are " & countRowz(check, 1) - 1 & " pre bills.")
 
 End Sub
 
@@ -206,34 +267,13 @@ Function firstFree(works As Worksheet) As Long
     firstFree = ActiveSheet.UsedRange.rows.Count + 1
 End Function
 
-Sub clear_all()
-Dim mb As Integer
-Dim arrSheets As Variant
-Dim sht As Variant
+Function countRowz(ws As Worksheet, column As Long) As Long
+'finds last used row (with header)
 
-mb = MsgBox("You are about to clear all data from pre bill sheets." & Chr(13) & "Are you sure?", vbOKCancel + vbQuestion)
-
-If mb = 1 Then
-    arrSheets = Array(Road, RoadUS, FCL, LCL, Air, ALL)
-    
-    For Each sht In arrSheets
-        If sht.Name = "ALL" Then
-            sht.Activate
-            sht.UsedRange.Select
-        Else
-            On Error Resume Next   'turn off error reporting
-            ActiveSheet.ShowAllData
-            sht.Activate
-            sht.UsedRange.Offset(1).Select
-            On Error GoTo 0
-        End If
-        Selection.EntireRow.Delete
-        Cells(2, 1).Select
-    Next sht
-    
-    MsgBox "Pre bill sheets are now empty."
+If ws.Cells(2, column) = "" Then
+    countRowz = ws.Cells(1, column).row
 Else
-    MsgBox "Macro cancelled."
+    countRowz = ws.Cells(1, column).End(xlDown).row
 End If
 
-End Sub
+End Function

@@ -32,6 +32,7 @@ Sub RemoveDuplicates()
     NEWlclRows = countRows(LCL, 1)
     NEWairRows = countRows(Air, 1)
 
+
 MsgBox "Remove duplicates finished." & Chr(13) _
         & "Road duplicates: " & roadRows - NEWroadRows & Chr(13) _
         & "Road US duplicates: " & roadUSRows - NEWroadUSRows & Chr(13) _
