@@ -1,4 +1,5 @@
 Attribute VB_Name = "mod_Save_Attachments"
+'Attribute VB_Name = "mod_Save_Attachments"
 ' *****************
 ' For Outlook 2010.
 ' *****************
@@ -105,7 +106,7 @@ Public Function SaveAttachmentsFromSelection() As Long
                         For Each atmt In atmts
                             
                             ' Get the full name of the current attachment.
-                            strAtmtFullName = mailSubject & "-" & atmt.filename
+                            strAtmtFullName = mailSubject & "-" & atmt.FileName
                             
                             ' Find the dot postion in atmtFullName.
                             intDotPosition = InStrRev(strAtmtFullName, ".")
@@ -115,7 +116,7 @@ Public Function SaveAttachmentsFromSelection() As Long
                             ' Get the file extension.
                             strAtmtName(1) = Right$(strAtmtFullName, Len(strAtmtFullName) - intDotPosition)
                             ' Get the full saving path of the current attachment.
-                            strAtmtPath = strFolderPath & mailSubject & "-" & atmt.filename
+                            strAtmtPath = strFolderPath & mailSubject & "-" & atmt.FileName
                             
                             ' /* If the length of the saving path is not larger than 260 characters.*/
                             If Len(strAtmtPath) <= MAX_PATH Then
@@ -200,5 +201,4 @@ Public Sub ExecuteSaving()
         MsgBox "No attachment(s) in the selected Outlook items.", vbInformation, "Message from Attachment Saver"
     End If
 End Sub
-
 

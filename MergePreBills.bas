@@ -11,6 +11,7 @@ Dim wb As Workbook
 Dim wbMerge As Workbook
 Dim directory As String
 Dim counter As Long, allFiles As Long
+Dim i As Integer
 Dim target As Range     'where to paste
 Dim pb As PreBill
 Dim pbNum As Double
@@ -56,11 +57,17 @@ Do Until Len(file) = 0                  'loop on files to be merged
     Set wb = Workbooks.Open(directory & file)
     Set ws = wb.Sheets(1)
     
-    If Range("B6") = "" Then    'Range("B6") can be empty with volatiles
-        GoTo Exception          'move on to the next pre bill
-    Else
-        pbNum = CDbl(Range("B6"))
-    End If
+    'Pre bills with status other than "Approved" should be ignored
+    For i = 10 To i = 1 Step -1
+        If Range("A" & i) = "Invoice status" And Range("B" & i) <> "Approved" Then
+            GoTo Exception                              'move on to the next pre bill
+        End If
+        
+        If Range("A" & i) = "Pre-bill Nr" Then          'dynamically check PB number (if Invoice status is "Approved")
+            pbNum = CDbl(Range("B" & i))
+            Exit For
+        End If
+    Next i
 
     Set pb = New PreBill                'setting new pre bill object with attributes from file
     
