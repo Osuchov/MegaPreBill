@@ -19,6 +19,7 @@ Dim fFree As Long, fFreeAll As Long
 Dim sht As Variant
 Dim arrSheets As Variant
 Dim completed As Single
+Dim preBills()
 
 directory = pickDir("Pick the directory with Excel files to merge", "Merge")
 
@@ -49,6 +50,8 @@ Loop
 
 file = Dir(directory & "*.xls")
 
+ReDim preBills(0 To 0)      'resetting preBills array
+
 Do Until Len(file) = 0                  'loop on files to be merged
     counter = counter + 1
     completed = Round((counter * 100) / allFiles, 0)
@@ -65,6 +68,14 @@ Do Until Len(file) = 0                  'loop on files to be merged
         
         If Range("A" & i) = "Pre-bill Nr" Then          'dynamically check PB number (if Invoice status is "Approved")
             pbNum = CDbl(Range("B" & i))
+            
+            If IsInArray(pbNum, preBills) = False Then  'add pre bill number to a dynamic array
+                preBills(UBound(preBills)) = pbNum      'check for doubles and ommit them if found
+                ReDim Preserve preBills(0 To UBound(preBills) + 1)
+            Else
+                GoTo Exception
+            End If
+            
             Exit For
         End If
     Next i
@@ -135,7 +146,8 @@ Next sht
 
 Unload UserForm1
 Application.ScreenUpdating = True
-MsgBox "Merging of " & counter & " Excel files completed", vbInformation
+MsgBox "Merging of " & counter & " Excel files completed." & vbNewLine & _
+UBound(preBills) & " unique pre bill(s) was(were) found and processed.", vbInformation
 
 End Sub
 
@@ -185,7 +197,7 @@ Dim arrSheets As Variant, sht As Variant
 Dim check As Worksheet
 Dim target As Range
 
-'Application.ScreenUpdating = False
+Application.ScreenUpdating = False
 
 Set check = Sheets("Check")
 arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
@@ -276,4 +288,8 @@ Else
     countRowz = ws.Cells(1, column).End(xlDown).row
 End If
 
+End Function
+
+Function IsInArray(stringToBeFound As Double, arr As Variant) As Boolean
+  IsInArray = (UBound(Filter(arr, stringToBeFound)) > -1)
 End Function

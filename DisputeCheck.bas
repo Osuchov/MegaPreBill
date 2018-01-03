@@ -100,8 +100,8 @@ For Each parkedDispute In disputeRng.Offset(1, 0).SpecialCells(xlCellTypeVisible
                         
                         If Not foundWhere Is Nothing Then    'if found again with correct carrier
                             If Carrier Like "*" & GeneralCN & "*" Then
-                                 GeneralCN = GeneralCarrierName(foundWhere.Offset(0, -5).Value)
-                                 ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
+                                GeneralCN = GeneralCarrierName(foundWhere.Offset(0, -5).Value)
+                                ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
                                 preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value 'assign it to the array
                             End If
                         Else
