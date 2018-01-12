@@ -21,7 +21,7 @@ Dim GeneralCN As String
 ThisWorkbook.Worksheets("Mapping").Activate
 
 With ThisWorkbook.Worksheets("Mapping")
-    lastMappingRow = .UsedRange.rows.Count
+    lastMappingRow = .UsedRange.Rows.Count
     Set translation = .Range(.Cells(1, 1), .Cells(lastMappingRow, 3))
 End With
 
@@ -50,7 +50,8 @@ If wb.Sheets(1).Name <> "Disputes" Then     'checks if 1st sheet is called "Disp
 End If
 
 Set wsDisputes = Sheets("Disputes")
-wsDisputes.rows("1:1").AutoFilter Field:=25, Criteria1:="parked" 'filters parked disputes
+wsDisputes.Activate
+wsDisputes.Rows("1:1").AutoFilter Field:=25, Criteria1:="parked" 'filters parked disputes
 
 Set disputeRng = wsDisputes.UsedRange.columns(9)    'shipment number is in column 9
 
