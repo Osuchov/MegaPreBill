@@ -220,6 +220,21 @@ MsgBox ("There are " & countRowz(check, 1) - 1 & " pre bills.")
 
 End Sub
 
+Sub PreBillOverview()
+
+Dim arrSheets As Variant, sht As Variant
+
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
+
+For Each sht In arrSheets
+    
+Next sht
+
+'Range("A2:I11,N2:P11").Select
+
+
+End Sub
+
 Function pickDir(winTitle As String, buttonTitle As String) As String
 
 Dim window As FileDialog
@@ -256,7 +271,7 @@ Function countRows() As Long
 Dim startPBBodyRow As Long
 
 startPBBodyRow = findStartRow()
-countRows = ActiveSheet.UsedRange.rows.Count - startPBBodyRow
+countRows = ActiveSheet.UsedRange.Rows.Count - startPBBodyRow
     
 End Function
 
@@ -276,7 +291,7 @@ End Function
 
 Function firstFree(works As Worksheet) As Long
     works.Activate
-    firstFree = ActiveSheet.UsedRange.rows.Count + 1
+    firstFree = ActiveSheet.UsedRange.Rows.Count + 1
 End Function
 
 Function countRowz(ws As Worksheet, column As Long) As Long
