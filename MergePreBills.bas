@@ -4,7 +4,7 @@ Option Explicit
 Sub Merge()
 
 Dim ws As Worksheet
-Dim wsRoad As Worksheet, wsFCL As Worksheet, wsLCL As Worksheet, wsAir As Worksheet, wsRoadUS As Worksheet, wsALL As Worksheet
+Dim wsRoad As Worksheet, wsFCL As Worksheet, wsLCL As Worksheet, wsAir As Worksheet, wsRoadUS As Worksheet, wsALL As Worksheet, wsAir2 As Worksheet
 Dim wsCons As Worksheet 'consolidated worksheet
 Dim file As String
 Dim wb As Workbook
@@ -38,6 +38,7 @@ Set wsRoadUS = wbMerge.Sheets("Road US")
 Set wsFCL = wbMerge.Sheets("FCL")
 Set wsLCL = wbMerge.Sheets("LCL")
 Set wsAir = wbMerge.Sheets("Air")
+Set wsAir2 = wbMerge.Sheets("Air 2")
 Set wsALL = wbMerge.Sheets("ALL")
 
 file = Dir(directory & "*.xls")
@@ -106,9 +107,12 @@ Do Until Len(file) = 0                  'loop on files to be merged
     ElseIf pb.Mode = "FCL" Or pb.Mode = "Sea" Then
         fFree = firstFree(wsFCL)
         Set target = wsFCL.Cells(fFree, 9)
-    ElseIf pb.Mode = "Air" Or pb.Mode = "Air 2" Then
+    ElseIf pb.Mode = "Air" Then
         fFree = firstFree(wsAir)
         Set target = wsAir.Cells(fFree, 9)
+    ElseIf pb.Mode = "Air 2" Then
+        fFree = firstFree(wsAir2)
+        Set target = wsAir2.Cells(fFree, 9)
     ElseIf pb.Mode = "Sea LCL" Then
         fFree = firstFree(wsLCL)
         Set target = wsLCL.Cells(firstFree(wsLCL), 9)
@@ -138,7 +142,7 @@ Exception:
     file = Dir
 Loop
 
-arrSheets = Array(Road, RoadUS, FCL, LCL, Air, ALL, check)
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2, ALL, check)
 
 For Each sht In arrSheets
     sht.UsedRange.WrapText = False
@@ -168,7 +172,7 @@ Dim sht As Variant
 mb = MsgBox("You are about to clear all data from pre bill sheets." & Chr(13) & "Are you sure?", vbOKCancel + vbQuestion)
 
 If mb = 1 Then
-    arrSheets = Array(Road, RoadUS, FCL, LCL, Air, ALL, check)
+    arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2, ALL, check, PBOverview)
     
     For Each sht In arrSheets
         If sht.Name = "ALL" Then
@@ -200,7 +204,7 @@ Dim target As Range
 Application.ScreenUpdating = False
 
 Set check = Sheets("Check")
-arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2)
 
 For Each sht In arrSheets
     Set target = check.Cells(countRowz(check, 1) + 1, 1)
@@ -224,7 +228,7 @@ Sub PreBillOverview()
 
 Dim arrSheets As Variant, sht As Variant
 
-arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2)
 
 For Each sht In arrSheets
     

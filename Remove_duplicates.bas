@@ -7,7 +7,7 @@ Sub RemoveDuplicates()
     Dim arrSheets As Variant, sht As Variant
     Dim colArr()
     
-    arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
+    arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2)
     
     roadRows = countRows(Road, 1)
     roadUSRows = countRows(RoadUS, 1)

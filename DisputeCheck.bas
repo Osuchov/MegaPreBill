@@ -150,7 +150,7 @@ Dim uniquePreBills As New Collection, a
 Dim i As Integer
 Dim shee As String
 
-arrSheets = Array(Road, RoadUS, FCL, LCL, Air)
+arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2)
 
 ReDim preBills(0 To 0)      'resetting found preBills array
 strPreBills = ""            'found pre bill collection to array
