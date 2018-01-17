@@ -5,12 +5,12 @@ Sub CheckAdditionalCosts()
 
 Dim fd As Office.FileDialog
 Dim lastMappingRow As Long
-Dim translation As Range
+Dim translation As range
 Dim wb As Workbook
 Dim wsACs As Worksheet
-Dim ACRng As Range
+Dim ACRng As range
 Dim ACFile As String
-Dim parkedAC As Range
+Dim parkedAC As range
 Dim shipment, carrier As String
 Dim missingShipmentRow As Long
 Dim counter As Long, allACs As Long
@@ -22,7 +22,7 @@ ThisWorkbook.Worksheets("Mapping").Activate
 
 With ThisWorkbook.Worksheets("Mapping")
     lastMappingRow = .UsedRange.Rows.Count
-    Set translation = .Range(.Cells(1, 1), .Cells(lastMappingRow, 3))
+    Set translation = .range(.Cells(1, 1), .Cells(lastMappingRow, 3))
 End With
 
 Set fd = Application.FileDialog(msoFileDialogFilePicker)
@@ -53,13 +53,13 @@ Set wsACs = Sheets("Additional Costs")
 wsACs.Activate
 wsACs.Rows("1:1").AutoFilter Field:=29, Criteria1:="Parked"     'filters parked Additional Costs
 
-Set ACRng = wsACs.UsedRange.columns(7)                  'shipment number is in column 9
+Set ACRng = wsACs.UsedRange.columns(7)                  'shipment number is in column 7
 
 allACs = 0                                     'additional costs counter
 
 'loop counts how many additional costs are parked
 For Each parkedAC In ACRng.Offset(1, 0).SpecialCells(xlCellTypeVisible).EntireRow
-    shipment = Cells(parkedAC.row, 9).Value
+    shipment = Cells(parkedAC.row, 7).Value
     If shipment <> "" Then
         allACs = allACs + 1
     Else
@@ -98,7 +98,7 @@ CleaningUp:
     Application.DisplayAlerts = True            'turning on warnings
     Application.AskToUpdateLinks = True
     Application.ScreenUpdating = True
-    Unload UserForm2
+    Unload UserForm3
     Exit Sub
 
 ErrHandling:
@@ -110,14 +110,14 @@ missingShipment:
     Application.AskToUpdateLinks = True
     Application.ScreenUpdating = True
 
-    Unload UserForm2
+    Unload UserForm3
     MsgBox "Shipment in row " & missingShipmentRow & " is missing. Check if that is the end of the file."
     Exit Sub
 End Sub
 
 Sub progress(completed As Single)
-UserForm2.Text.Caption = completed & "% Completed"
-UserForm2.Bar.Width = completed * 2
+UserForm3.Text.Caption = completed & "% Completed"
+UserForm3.Bar.Width = completed * 2
 
 DoEvents
 
@@ -128,7 +128,7 @@ Function findPreBillForACShipment(shpmnt As Variant, crrr As String) As String
 
 Dim preBills()
 Dim arrSheets As Variant, sht As Variant
-Dim lookWhere As Range, foundwhere As Range
+Dim lookWhere As range, foundwhere As range
 Dim PBCrrr As Variant   'pre bill carrier name
 Dim firstFoundAddress As String
 Dim check As Integer, check2 As Integer
@@ -144,7 +144,7 @@ strPreBills = ""            'found pre bill collection to array
 
 For Each sht In arrSheets   'loop through all transport modes
     shee = sht.Name
-    Set lookWhere = sht.UsedRange.columns(7)    'shipment number is in column 7
+    Set lookWhere = sht.UsedRange.columns(9)    'shipment number is in column 9
     Set foundwhere = lookWhere.Find(what:=shpmnt, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
             MatchCase:=False, SearchFormat:=False)
 
@@ -152,7 +152,7 @@ For Each sht In arrSheets   'loop through all transport modes
         firstFoundAddress = foundwhere.Address  'remember first found address
         PBCrrr = foundwhere.Offset(0, -5).Value
         check = InStr(LCase(PBCrrr), LCase(crrr))
-        check2 = checkIfActivityCodeCellIsEmpty(foundwhere.row, shee)
+        check2 = checkIfActivityCodeCellIsEmpty(foundwhere, shee)
 
         If check <> 0 And check2 <> 0 Then
             preBills(UBound(preBills)) = sht.Cells(foundwhere.row, 1).Value     'allocate first found element
@@ -164,7 +164,7 @@ For Each sht In arrSheets   'loop through all transport modes
             If Not foundwhere Is Nothing Then    'if found again with correct carrier
                 PBCrrr = foundwhere.Offset(0, -5).Value
                 check = InStr(LCase(PBCrrr), LCase(crrr))
-                check2 = checkIfActivityCodeCellIsEmpty(foundwhere.row, shee)
+                check2 = checkIfActivityCodeCellIsEmpty(foundwhere, shee)
 
                 If check <> 0 And check2 <> 0 Then
                     ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
@@ -202,14 +202,17 @@ findPreBillForACShipment = strPreBills
 
 End Function
 
-Public Function checkIfActivityCodeCellIsEmpty(row As Long, sheet As String) As Integer
+Public Function checkIfActivityCodeCellIsEmpty(cellRange As range, sheet As String) As Integer
 
 Dim ActivityCodeColumn As Long
 Dim ColumnNumber As Long
-Dim testCell As Range
+Dim testCell As range
 Dim testCellValue As String
+Dim row As Long
 
-ColumnNumber = findColumnNumber("Activity code", sheet)
+row = cellRange.row
+
+ColumnNumber = findColumnNum("Activity code", sheet)
 Set testCell = Cells(row, ColumnNumber)
 testCellValue = testCell.Value
 
@@ -222,16 +225,27 @@ End If
 
 End Function
 
-Sub test()
+Function findColumnNum(columnName As String, sheet As String) As Long
+'searches for a given column name in given sheet (row 1) and returns its number
 
-Dim foundwhere As Range
-Dim shee As String
-Dim check2 As Integer
+Dim searchRange As range
+Dim cell As range
+Dim col As Long
+Dim komorka As String
+Dim ws As Worksheet
 
-Set foundwhere = Range("I10713")
+Set ws = Workbooks("Merge Prebills.xlsb").Worksheets(sheet)
+Set searchRange = ws.range(ws.Cells(1, 1), ws.Cells(1, 50))
+col = 0
 
-shee = "Road"
-check2 = checkIfActivityCodeCellIsEmpty(foundwhere.row, shee)
+For Each cell In searchRange
+    komorka = cell.Value
+    If cell.Value = columnName Then
+        col = cell.column
+        Exit For
+    End If
+Next cell
 
-End Sub
+findColumnNum = col
 
+End Function

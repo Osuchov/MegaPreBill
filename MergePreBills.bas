@@ -12,7 +12,7 @@ Dim wbMerge As Workbook
 Dim directory As String
 Dim counter As Long, allFiles As Long
 Dim i As Integer
-Dim target As Range     'where to paste
+Dim target As range     'where to paste
 Dim pb As PreBill
 Dim pbNum As Double
 Dim fFree As Long, fFreeAll As Long
@@ -63,12 +63,12 @@ Do Until Len(file) = 0                  'loop on files to be merged
     
     'Pre bills with status other than "Approved" should be ignored
     For i = 10 To i = 1 Step -1
-        If Range("A" & i) = "Invoice status" And Range("B" & i) <> "Approved" Then
+        If range("A" & i) = "Invoice status" And range("B" & i) <> "Approved" Then
             GoTo Exception                              'move on to the next pre bill
         End If
         
-        If Range("A" & i) = "Pre-bill Nr" Then          'dynamically check PB number (if Invoice status is "Approved")
-            pbNum = CDbl(Range("B" & i))
+        If range("A" & i) = "Pre-bill Nr" Then          'dynamically check PB number (if Invoice status is "Approved")
+            pbNum = CDbl(range("B" & i))
             
             If IsInArray(pbNum, preBills) = False Then  'add pre bill number to a dynamic array
                 preBills(UBound(preBills)) = pbNum      'check for doubles and ommit them if found
@@ -83,14 +83,14 @@ Do Until Len(file) = 0                  'loop on files to be merged
 
     Set pb = New PreBill                'setting new pre bill object with attributes from file
     
-    pb.CC = Range("C1")                 'setting company code
+    pb.CC = range("C1")                 'setting company code
     pb.Number = pbNum
-    pb.CarrierCode = Range("C2")    'setting the rest of pre bill attributes
-    pb.CarrierName = Range("B2")
-    pb.Status = Range("B9")
-    pb.Vendor = Range("B5")
-    pb.Period = Range("B3")
-    pb.CreationDate = Range("B7")
+    pb.CarrierCode = range("C2")    'setting the rest of pre bill attributes
+    pb.CarrierName = range("B2")
+    pb.Status = range("B9")
+    pb.Vendor = range("B5")
+    pb.Period = range("B3")
+    pb.CreationDate = range("B7")
     pb.NumberOfColumns = countColumns()
     pb.NumberOfRows = countRows()
     pb.StartRow = findStartRow()
@@ -198,7 +198,7 @@ End Sub
 Sub CountGeneratedPreBills()
 Dim arrSheets As Variant, sht As Variant
 Dim check As Worksheet
-Dim target As Range
+Dim target As range
 
 Application.ScreenUpdating = False
 
@@ -208,14 +208,14 @@ arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2)
 For Each sht In arrSheets
     Set target = check.Cells(countRowz(check, 1) + 1, 1)
     sht.Activate
-    sht.Range(Cells(2, 1), Cells(countRowz(Sheets(sht.Name), 1) + 1, 1)).Select
+    sht.range(Cells(2, 1), Cells(countRowz(Sheets(sht.Name), 1) + 1, 1)).Select
     Selection.Copy
     target.PasteSpecial Paste:=xlPasteValuesAndNumberFormats
 Next sht
 
 check.UsedRange.RemoveDuplicates columns:=(1), Header:=xlYes
 check.Activate
-check.Range("A1").Select
+check.range("A1").Select
 
 Application.ScreenUpdating = True
 
@@ -227,13 +227,13 @@ Sub PreBillOverview()
 
 Dim arrSheets As Variant, sht As Variant
 Dim columnNames As Variant
-Dim columnNumber As Long
+Dim ColumnNumber As Long
 Dim targetColumnNumber As Long, targetRowNumber As Long
 Dim columnNamesLenght As Long
 Dim i As Long
 Dim sheetRows As Long
 Dim PBO As Worksheet
-Dim target As Range
+Dim target As range
 
 Set PBO = ThisWorkbook.Worksheets("PreBillOverview")
 
@@ -247,14 +247,16 @@ For Each sht In arrSheets
     sheetRows = ActiveSheet.UsedRange.Rows.Count
     
     For i = 0 To columnNamesLenght - 1
-        columnNumber = findColumnNumber(CStr(columnNames(i)), CStr(sht.Name))
-        On Error Resume Next
-        sht.Range(Cells(2, columnNumber), Cells(sheetRows, columnNumber)).Copy
+        ColumnNumber = findColumnNumber(CStr(columnNames(i)), CStr(sht.Name))
+        'On Error Resume Next
+        sht.range(Cells(2, ColumnNumber), Cells(sheetRows, ColumnNumber)).Copy
         
         targetColumnNumber = findColumnNumber(CStr(columnNames(i)), CStr(PBO.Name))
         targetRowNumber = countRowz(PBO, targetColumnNumber) + 1
         Set target = PBO.Cells(targetRowNumber, targetColumnNumber)
         target.PasteSpecial xlPasteValues
+        
+        'PBO.Range(Cells(PBORows + 1, targetColumnNumber), Cells(PBORows + 1, targetColumnNumber)).PasteSpecial xlPasteValues
         
     Next i
     
@@ -262,10 +264,10 @@ On Error GoTo 0
 
 PBO.Activate
 targetRowNumber = countRowz(PBO, 1) + 1
-PBO.Range(Cells(targetRowNumber, 1), Cells(firstFree(PBO) - 1, 1)).Value = sht.Name
+PBO.range(Cells(targetRowNumber, 1), Cells(firstFree(PBO) - 1, 1)).Value = sht.Name
 
 targetRowNumber = countRowz(PBO, 2) + 1
-sht.Range("A2:H" & sheetRows).Copy Destination:=PBO.Range("B" & targetRowNumber)
+sht.range("A2:H" & sheetRows).Copy Destination:=PBO.range("B" & targetRowNumber)
 
 Next sht
 
@@ -274,12 +276,18 @@ End Sub
 Function findColumnNumber(columnName As String, sheet As String) As Long
 'searches for a given column name in given sheet (row 1) and returns its number
 
-Dim searchRange As Range
-Dim cell As Range
+Dim searchRange As range
+Dim cell As range
 Dim col As Long
+'Dim ws As Worksheet
 
-Set searchRange = Worksheets(sheet).Range("A1:AZ1") '(Cells(1, 1), Cells(1, 50)) '("A1:A50")
+'Set ws = Workbooks("Merge Prebills.xlsb").Worksheets(sheet)
+'Set searchRange = ws.Range(ws.Cells(1, 1), ws.Cells(1, 50))
+
+Set searchRange = range(Cells(1, 1), Cells(1, 50))
 col = 0
+
+'Set searchRange = ws.Range(Cells(1, 1), Cells(1, 50)) '("A1:A50") '("A1:AZ1")
 
 For Each cell In searchRange
     If cell.Value = columnName Then
@@ -333,11 +341,11 @@ countRows = ActiveSheet.UsedRange.Rows.Count - startPBBodyRow
 End Function
 
 Function findStartRow() As Long
-Dim cell As Range
+Dim cell As range
 
 findStartRow = 12   'by default starting row should be 12. If it is not, the loop will find it
 
-For Each cell In ActiveSheet.Range("A:A").Cells
+For Each cell In ActiveSheet.range("A:A").Cells
     If cell.Value = "Referencenr" Then
         findStartRow = cell.row + 1
         Exit For
