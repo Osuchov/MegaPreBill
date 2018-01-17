@@ -163,7 +163,6 @@ DoEvents
 
 End Sub
 
-
 Sub clear_all()
 Dim mb As Integer
 Dim arrSheets As Variant
@@ -227,17 +226,71 @@ End Sub
 Sub PreBillOverview()
 
 Dim arrSheets As Variant, sht As Variant
+Dim columnNames As Variant
+Dim columnNumber As Long
+Dim targetColumnNumber As Long, targetRowNumber As Long
+Dim columnNamesLenght As Long
+Dim i As Long
+Dim sheetRows As Long
+Dim PBO As Worksheet
+Dim target As Range
+
+Set PBO = ThisWorkbook.Worksheets("PreBillOverview")
 
 arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2)
+columnNames = Array("Referencenr", "Pickup city", "Pickup country", "Delivery city", "Delivery country", "Activity code", "Activity type", _
+                "Calculated", "Calculated Currency", "Currency Exchange Date", "Invoice Currency", "Calculated in Invoice Currency", "Invoiced before", "To be invoiced")
+columnNamesLenght = UBound(columnNames) + 1
 
 For Each sht In arrSheets
+    sht.Activate
+    sheetRows = ActiveSheet.UsedRange.Rows.Count
     
+    For i = 0 To columnNamesLenght - 1
+        columnNumber = findColumnNumber(CStr(columnNames(i)), CStr(sht.Name))
+        On Error Resume Next
+        sht.Range(Cells(2, columnNumber), Cells(sheetRows, columnNumber)).Copy
+        
+        targetColumnNumber = findColumnNumber(CStr(columnNames(i)), CStr(PBO.Name))
+        targetRowNumber = countRowz(PBO, targetColumnNumber) + 1
+        Set target = PBO.Cells(targetRowNumber, targetColumnNumber)
+        target.PasteSpecial xlPasteValues
+        
+    Next i
+    
+On Error GoTo 0
+
+PBO.Activate
+targetRowNumber = countRowz(PBO, 1) + 1
+PBO.Range(Cells(targetRowNumber, 1), Cells(firstFree(PBO) - 1, 1)).Value = sht.Name
+
+targetRowNumber = countRowz(PBO, 2) + 1
+sht.Range("A2:H" & sheetRows).Copy Destination:=PBO.Range("B" & targetRowNumber)
+
 Next sht
 
-'Range("A2:I11,N2:P11").Select
-
-
 End Sub
+
+Function findColumnNumber(columnName As String, sheet As String) As Long
+'searches for a given column name in given sheet (row 1) and returns its number
+
+Dim searchRange As Range
+Dim cell As Range
+Dim col As Long
+
+Set searchRange = Worksheets(sheet).Range("A1:AZ1") '(Cells(1, 1), Cells(1, 50)) '("A1:A50")
+col = 0
+
+For Each cell In searchRange
+    If cell.Value = columnName Then
+        col = cell.column
+        Exit For
+    End If
+Next cell
+
+findColumnNumber = col
+
+End Function
 
 Function pickDir(winTitle As String, buttonTitle As String) As String
 
