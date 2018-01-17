@@ -128,10 +128,10 @@ Function findPreBillForACShipment(shpmnt As Variant, crrr As String) As String
 
 Dim preBills()
 Dim arrSheets As Variant, sht As Variant
-Dim lookWhere As Range, foundWhere As Range
+Dim lookWhere As Range, foundwhere As Range
 Dim PBCrrr As Variant   'pre bill carrier name
 Dim firstFoundAddress As String
-Dim check As Integer
+Dim check As Integer, check2 As Integer
 Dim strPreBills As String
 Dim uniquePreBills As New Collection, a
 Dim i As Integer
@@ -145,34 +145,36 @@ strPreBills = ""            'found pre bill collection to array
 For Each sht In arrSheets   'loop through all transport modes
     shee = sht.Name
     Set lookWhere = sht.UsedRange.columns(7)    'shipment number is in column 7
-    Set foundWhere = lookWhere.Find(what:=shpmnt, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+    Set foundwhere = lookWhere.Find(what:=shpmnt, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
             MatchCase:=False, SearchFormat:=False)
 
-    If Not foundWhere Is Nothing Then   'if found
-        firstFoundAddress = foundWhere.Address  'remember first found address
-        PBCrrr = foundWhere.Offset(0, -5).Value
+    If Not foundwhere Is Nothing Then   'if found
+        firstFoundAddress = foundwhere.Address  'remember first found address
+        PBCrrr = foundwhere.Offset(0, -5).Value
         check = InStr(LCase(PBCrrr), LCase(crrr))
+        check2 = checkIfActivityCodeCellIsEmpty(foundwhere.row, shee)
 
-        If check <> 0 Then
-            preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value     'allocate first found element
+        If check <> 0 And check2 <> 0 Then
+            preBills(UBound(preBills)) = sht.Cells(foundwhere.row, 1).Value     'allocate first found element
         End If
 
         Do  'loop for FindNext until found address = first found address
-            Set foundWhere = lookWhere.FindNext(foundWhere)
+            Set foundwhere = lookWhere.FindNext(foundwhere)
 
-            If Not foundWhere Is Nothing Then    'if found again with correct carrier
-                PBCrrr = foundWhere.Offset(0, -5).Value
+            If Not foundwhere Is Nothing Then    'if found again with correct carrier
+                PBCrrr = foundwhere.Offset(0, -5).Value
                 check = InStr(LCase(PBCrrr), LCase(crrr))
+                check2 = checkIfActivityCodeCellIsEmpty(foundwhere.row, shee)
 
-                If check <> 0 Then
+                If check <> 0 And check2 <> 0 Then
                     ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
-                    preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value 'assign it to the array
+                    preBills(UBound(preBills)) = sht.Cells(foundwhere.row, 1).Value 'assign it to the array
                 End If
             Else
                 Exit Do                         'if not found again
             End If
 
-        Loop While foundWhere.Address <> firstFoundAddress
+        Loop While foundwhere.Address <> firstFoundAddress
     End If
 Next sht
 
@@ -199,3 +201,37 @@ Set uniquePreBills = Nothing
 findPreBillForACShipment = strPreBills
 
 End Function
+
+Public Function checkIfActivityCodeCellIsEmpty(row As Long, sheet As String) As Integer
+
+Dim ActivityCodeColumn As Long
+Dim ColumnNumber As Long
+Dim testCell As Range
+Dim testCellValue As String
+
+ColumnNumber = findColumnNumber("Activity code", sheet)
+Set testCell = Cells(row, ColumnNumber)
+testCellValue = testCell.Value
+
+If testCellValue = "" Then
+    checkIfActivityCodeCellIsEmpty = 1
+Else
+    checkIfActivityCodeCellIsEmpty = 0
+End If
+
+
+End Function
+
+Sub test()
+
+Dim foundwhere As Range
+Dim shee As String
+Dim check2 As Integer
+
+Set foundwhere = Range("I10713")
+
+shee = "Road"
+check2 = checkIfActivityCodeCellIsEmpty(foundwhere.row, shee)
+
+End Sub
+
