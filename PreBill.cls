@@ -68,8 +68,8 @@ End Property
 Public Property Let CarrierCode(CCode As String)
     pCarrierCode = CCode
 End Property
-Public Property Let CarrierName(CName As String)
-    pCarrierName = CName
+Public Property Let CarrierName(cName As String)
+    pCarrierName = cName
 End Property
 Public Property Let Status(stat As String)
     pStatus = stat
@@ -97,18 +97,18 @@ Public Property Let Mode(transMode As String)
 End Property
 
 Public Function Copy()              'copying the pre bill table
-    Set pbBody = Range(Cells(StartRow, 1), Cells((NumberOfRows + StartRow - 1), NumberOfColumns))
+    Set pbBody = range(Cells(StartRow, 1), Cells((NumberOfRows + StartRow - 1), NumberOfColumns))
     pbBody.Select
     Selection.Copy
 End Function
 
 Public Function PastePBData(firstFreeRow As Long)   'pasting the pre bill table
-    Range(Cells(firstFreeRow, 1), Cells(ActiveSheet.UsedRange.rows.Count, 1)).Value = Number()
-    Range(Cells(firstFreeRow, 2), Cells(ActiveSheet.UsedRange.rows.Count, 2)).Value = CC()
-    Range(Cells(firstFreeRow, 3), Cells(ActiveSheet.UsedRange.rows.Count, 3)).Value = CarrierCode()
-    Range(Cells(firstFreeRow, 4), Cells(ActiveSheet.UsedRange.rows.Count, 4)).Value = CarrierName()
-    Range(Cells(firstFreeRow, 5), Cells(ActiveSheet.UsedRange.rows.Count, 5)).Value = Status()
-    Range(Cells(firstFreeRow, 6), Cells(ActiveSheet.UsedRange.rows.Count, 6)).Value = Vendor()
-    Range(Cells(firstFreeRow, 7), Cells(ActiveSheet.UsedRange.rows.Count, 7)).Value = Period()
-    Range(Cells(firstFreeRow, 8), Cells(ActiveSheet.UsedRange.rows.Count, 8)).Value = CreationDate()
+    range(Cells(firstFreeRow, 1), Cells(ActiveSheet.UsedRange.Rows.Count, 1)).Value = Number()
+    range(Cells(firstFreeRow, 2), Cells(ActiveSheet.UsedRange.Rows.Count, 2)).Value = CC()
+    range(Cells(firstFreeRow, 3), Cells(ActiveSheet.UsedRange.Rows.Count, 3)).Value = CarrierCode()
+    range(Cells(firstFreeRow, 4), Cells(ActiveSheet.UsedRange.Rows.Count, 4)).Value = CarrierName()
+    range(Cells(firstFreeRow, 5), Cells(ActiveSheet.UsedRange.Rows.Count, 5)).Value = Status()
+    range(Cells(firstFreeRow, 6), Cells(ActiveSheet.UsedRange.Rows.Count, 6)).Value = Vendor()
+    range(Cells(firstFreeRow, 7), Cells(ActiveSheet.UsedRange.Rows.Count, 7)).Value = Period()
+    range(Cells(firstFreeRow, 8), Cells(ActiveSheet.UsedRange.Rows.Count, 8)).Value = CreationDate()
 End Function

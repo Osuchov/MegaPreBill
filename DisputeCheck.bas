@@ -7,10 +7,10 @@ Dim fd As Office.FileDialog
 Dim wb As Workbook
 Dim wsDisputes As Worksheet
 Dim disputeFile As String
-Dim disputeRng As Range
-Dim parkedDispute As Range
+Dim disputeRng As range
+Dim parkedDispute As range
 Dim shipment, carrier As String
-Dim translation As Range
+Dim translation As range
 Dim lastMappingRow As Long
 Dim missingShipmentRow As Long
 Dim counter As Long, allDisputes As Long
@@ -22,7 +22,7 @@ ThisWorkbook.Worksheets("Mapping").Activate
 
 With ThisWorkbook.Worksheets("Mapping")
     lastMappingRow = .UsedRange.Rows.Count
-    Set translation = .Range(.Cells(1, 1), .Cells(lastMappingRow, 3))
+    Set translation = .range(.Cells(1, 1), .Cells(lastMappingRow, 3))
 End With
 
 Set fd = Application.FileDialog(msoFileDialogFilePicker)
@@ -123,7 +123,7 @@ DoEvents
 
 End Sub
 
-Function GeneralCarrierName(FullCarrierName As String, translation As Range) As String 'returns a general carrier name from full carrier name
+Function GeneralCarrierName(FullCarrierName As String, translation As range) As String 'returns a general carrier name from full carrier name
 
 On Error GoTo NotFound
 GeneralCarrierName = Application.WorksheetFunction.VLookup(FullCarrierName, translation, 3, 0)
@@ -141,7 +141,7 @@ Function findPreBillForShipment(shpmnt As Variant, crrr As String) As String
 
 Dim preBills()
 Dim arrSheets As Variant, sht As Variant
-Dim lookWhere As Range, foundWhere As Range
+Dim lookWhere As range, foundwhere As range
 Dim PBCrrr As Variant   'pre bill carrier name
 Dim firstFoundAddress As String
 Dim check As Integer
@@ -158,34 +158,34 @@ strPreBills = ""            'found pre bill collection to array
 For Each sht In arrSheets   'loop through all transport modes
     shee = sht.Name
     Set lookWhere = sht.UsedRange.columns(9)    'shipment number is in column 9
-    Set foundWhere = lookWhere.Find(what:=shpmnt, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+    Set foundwhere = lookWhere.Find(what:=shpmnt, LookIn:=xlValues, LookAt:=xlWhole, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
             MatchCase:=False, SearchFormat:=False)
             
-    If Not foundWhere Is Nothing Then   'if found
-        firstFoundAddress = foundWhere.Address  'remember first found address
-        PBCrrr = foundWhere.Offset(0, -5).Value
+    If Not foundwhere Is Nothing Then   'if found
+        firstFoundAddress = foundwhere.Address  'remember first found address
+        PBCrrr = foundwhere.Offset(0, -5).Value
         check = InStr(LCase(PBCrrr), LCase(crrr))
         
         If check <> 0 Then
-            preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value     'allocate first found element
+            preBills(UBound(preBills)) = sht.Cells(foundwhere.row, 1).Value     'allocate first found element
         End If
         
         Do  'loop for FindNext until found address = first found address
-            Set foundWhere = lookWhere.FindNext(foundWhere)
+            Set foundwhere = lookWhere.FindNext(foundwhere)
 
-            If Not foundWhere Is Nothing Then    'if found again with correct carrier
-                PBCrrr = foundWhere.Offset(0, -5).Value
+            If Not foundwhere Is Nothing Then    'if found again with correct carrier
+                PBCrrr = foundwhere.Offset(0, -5).Value
                 check = InStr(LCase(PBCrrr), LCase(crrr))
                 
                 If check <> 0 Then
                     ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
-                    preBills(UBound(preBills)) = sht.Cells(foundWhere.row, 1).Value 'assign it to the array
+                    preBills(UBound(preBills)) = sht.Cells(foundwhere.row, 1).Value 'assign it to the array
                 End If
             Else
                 Exit Do                         'if not found again
             End If
             
-        Loop While foundWhere.Address <> firstFoundAddress
+        Loop While foundwhere.Address <> firstFoundAddress
     End If
 Next sht
 
@@ -212,3 +212,4 @@ Set uniquePreBills = Nothing
 findPreBillForShipment = strPreBills
 
 End Function
+

@@ -136,7 +136,9 @@ Dim strPreBills As String
 Dim uniquePreBills As New Collection, a
 Dim i As Integer
 Dim shee As String
+Dim mergeFile As String
 
+mergeFile = ThisWorkbook.Name
 arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2)
 
 ReDim preBills(0 To 0)      'resetting found preBills array
@@ -152,7 +154,7 @@ For Each sht In arrSheets   'loop through all transport modes
         firstFoundAddress = foundwhere.Address  'remember first found address
         PBCrrr = foundwhere.Offset(0, -5).Value
         check = InStr(LCase(PBCrrr), LCase(crrr))
-        check2 = checkIfActivityCodeCellIsEmpty(foundwhere, shee)
+        check2 = checkIfActivityCodeCellIsEmpty(foundwhere, mergeFile, shee)
 
         If check <> 0 And check2 <> 0 Then
             preBills(UBound(preBills)) = sht.Cells(foundwhere.row, 1).Value     'allocate first found element
@@ -164,7 +166,7 @@ For Each sht In arrSheets   'loop through all transport modes
             If Not foundwhere Is Nothing Then    'if found again with correct carrier
                 PBCrrr = foundwhere.Offset(0, -5).Value
                 check = InStr(LCase(PBCrrr), LCase(crrr))
-                check2 = checkIfActivityCodeCellIsEmpty(foundwhere, shee)
+                check2 = checkIfActivityCodeCellIsEmpty(foundwhere, mergeFile, shee)
 
                 If check <> 0 And check2 <> 0 Then
                     ReDim Preserve preBills(0 To UBound(preBills) + 1)              'allocate next found element
@@ -202,18 +204,20 @@ findPreBillForACShipment = strPreBills
 
 End Function
 
-Public Function checkIfActivityCodeCellIsEmpty(cellRange As range, sheet As String) As Integer
+Public Function checkIfActivityCodeCellIsEmpty(cellRange As range, file As String, sheet As String) As Integer
 
 Dim ActivityCodeColumn As Long
 Dim ColumnNumber As Long
 Dim testCell As range
 Dim testCellValue As String
 Dim row As Long
+Dim ws As Worksheet
 
+Set ws = Workbooks(file).Worksheets(sheet)
 row = cellRange.row
 
-ColumnNumber = findColumnNum("Activity code", sheet)
-Set testCell = Cells(row, ColumnNumber)
+ColumnNumber = findColumnNum("Activity code", file, sheet)
+Set testCell = ws.Cells(row, ColumnNumber)
 testCellValue = testCell.Value
 
 If testCellValue = "" Then
@@ -225,7 +229,7 @@ End If
 
 End Function
 
-Function findColumnNum(columnName As String, sheet As String) As Long
+Function findColumnNum(columnName As String, file As String, sheet As String) As Long
 'searches for a given column name in given sheet (row 1) and returns its number
 
 Dim searchRange As range
@@ -234,7 +238,7 @@ Dim col As Long
 Dim komorka As String
 Dim ws As Worksheet
 
-Set ws = Workbooks("Merge Prebills.xlsb").Worksheets(sheet)
+Set ws = Workbooks(file).Worksheets(sheet)
 Set searchRange = ws.range(ws.Cells(1, 1), ws.Cells(1, 50))
 col = 0
 
@@ -249,3 +253,14 @@ Next cell
 findColumnNum = col
 
 End Function
+
+Sub test()
+
+Dim ColumnNumber As Long
+Dim sheet As String
+
+
+sheet = "Road"
+ColumnNumber = findColumnNum("Activity code", sheet)
+
+End Sub
