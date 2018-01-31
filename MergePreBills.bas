@@ -6,7 +6,7 @@ Sub Merge()
 Dim ws As Worksheet
 Dim wsRoad As Worksheet, wsFCL As Worksheet, wsLCL As Worksheet, wsAir As Worksheet, wsRoadUS As Worksheet, wsALL As Worksheet, wsAir2 As Worksheet
 Dim wsCons As Worksheet 'consolidated worksheet
-Dim file As String
+Dim file As String, file2 As String
 Dim wb As Workbook
 Dim wbMerge As Workbook
 Dim directory As String
@@ -42,18 +42,21 @@ Set wsAir2 = wbMerge.Sheets("Air 2")
 Set wsALL = wbMerge.Sheets("ALL")
 
 file = Dir(directory & "*.xls")
+file2 = Dir(directory & "*.xlsx")
 allFiles = 0
 
-Do While file <> ""
+Do While file <> "" And file2 <> ""
     allFiles = allFiles + 1
     file = Dir()
+    file2 = Dir()
 Loop
 
 file = Dir(directory & "*.xls")
+file2 = Dir(directory & "*.xlsx")
 
 ReDim preBills(0 To 0)      'resetting preBills array
 
-Do Until Len(file) = 0                  'loop on files to be merged
+Do Until Len(file) = 0 Or Len(file2) = 0                  'loop on files to be merged
     counter = counter + 1
     completed = Round((counter * 100) / allFiles, 0)
     progress completed
@@ -140,6 +143,7 @@ Exception:
     Application.CutCopyMode = False
     wb.Close False
     file = Dir
+    file2 = Dir
 Loop
 
 arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2, ALL, check)
