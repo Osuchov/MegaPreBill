@@ -237,6 +237,8 @@ Dim target As range
 
 Set PBO = ThisWorkbook.Worksheets("PreBillOverview")
 
+Application.ScreenUpdating = False
+
 arrSheets = Array(Road, RoadUS, FCL, LCL, Air, Air2)
 columnNames = Array("Referencenr", "Pickup city", "Pickup country", "Delivery city", "Delivery country", "Activity code", "Activity type", _
                 "Calculated", "Calculated Currency", "Currency Exchange Date", "Invoice Currency", "Calculated in Invoice Currency", "Invoiced before", "To be invoiced")
@@ -249,6 +251,7 @@ For Each sht In arrSheets
     For i = 0 To columnNamesLenght - 1
         ColumnNumber = findColumnNumber(CStr(columnNames(i)), CStr(sht.Name))
         'On Error Resume Next
+        sht.Activate
         sht.range(Cells(2, ColumnNumber), Cells(sheetRows, ColumnNumber)).Copy
         
         targetColumnNumber = findColumnNumber(CStr(columnNames(i)), CStr(PBO.Name))
@@ -271,6 +274,8 @@ sht.range("A2:H" & sheetRows).Copy Destination:=PBO.range("B" & targetRowNumber)
 
 Next sht
 
+Application.ScreenUpdating = True
+
 End Sub
 
 Function findColumnNumber(columnName As String, sheet As String) As Long
@@ -279,15 +284,12 @@ Function findColumnNumber(columnName As String, sheet As String) As Long
 Dim searchRange As range
 Dim cell As range
 Dim col As Long
-'Dim ws As Worksheet
+Dim ws As Worksheet
 
-'Set ws = Workbooks("Merge Prebills.xlsb").Worksheets(sheet)
-'Set searchRange = ws.Range(ws.Cells(1, 1), ws.Cells(1, 50))
+Set ws = Worksheets(sheet)
+Set searchRange = ws.range(ws.Cells(1, 1), ws.Cells(1, 50))
 
-Set searchRange = range(Cells(1, 1), Cells(1, 50))
 col = 0
-
-'Set searchRange = ws.Range(Cells(1, 1), Cells(1, 50)) '("A1:A50") '("A1:AZ1")
 
 For Each cell In searchRange
     If cell.Value = columnName Then
